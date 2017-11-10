@@ -1,8 +1,15 @@
 from django.shortcuts import render
+from Blog import models
 # Create your views here.
-from django.http import HttpResponse
-
 
 def index(request):
-    return HttpResponse("hello world") #测试返回代码
+    user = models.user.objects.get(id=1)
+    return render(request,'index.html',{"TEST":user})
+
+
+
+def login(getusernmae,getpassword,gettoken):
+    usernmae = models.user.objects.get(username=getusernmae)
+
+    return "success"
 
