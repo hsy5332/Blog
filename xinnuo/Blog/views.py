@@ -1,9 +1,10 @@
-from django.shortcuts import render
-from Blog import models
-from django.http import HttpResponse
 import time
-import json
-# Create your views here.
+
+from django.http import HttpResponse
+from django.shortcuts import render
+
+from Blog import models
+
 
 def index(request):
     user = models.user.objects.get(id=1)
@@ -43,6 +44,7 @@ def login(request):
 #登录接口
 
 def register(request):
+    #request.encoding='utf-8'
     if request.POST:
         try:
             postUsername = models.user.objects.get(username=request.POST['username'])#这个就能判断用户名是否存在
@@ -53,23 +55,43 @@ def register(request):
                 return HttpResponse("该手机号已经使用了！")
             except:
                 try:
-                    phoneStatus = models.phone_status.objects.get(phonenumber=request.POST['phonenumber']) #判断手机号是否存在phone_status表中
-                    if int(phoneStatus.status) == 1:#判断手机号是否被锁定
+                    if len(request.POST['phonenumber']) >= 11:#判断手机号长度
+                        try:
+                            phoneStatus = models.phone_status.objects.get(
+                                phonenumber=request.POST['phonenumber'])  # 判断手机号是否存在phone_status表中
+                            if int(phoneStatus.status) == 1:  # 判断手机号是否被锁定
+                                try:
+                                    phoneMessage = models.phone_message.objects.get(
+                                        phonenumber=request.POST['phonenumber'], mcodestatus=1)  # 判断是否有短信验证码
+                                    return HttpResponse(phoneMessage.messagecode)
+                                except:
+                                    return HttpResponse("没有获取到手机验证码，请重试。")
+                            else:
+                                return HttpResponse("该手机号已经被锁定，请解锁后再操作。")
+                        except:
                             try:
-                                phoneMessage = models.phone_message.objects.get(phonenumber=request.POST['phonenumber'],mcodestatus=1)#判断是否有短信验证码
+                                phoneMessage = models.phone_message.objects.get(phonenumber=request.POST['phonenumber'],
+                                                                                mcodestatus=1)  # 判断是否有短信验证码
                                 return HttpResponse(phoneMessage.messagecode)
                             except:
-                                return HttpResponse("没有获取到验证码，请重试。")
+                                return HttpResponse("没有获取到手机验证码，请重试。")
                     else:
-                        return HttpResponse("该手机号已经被锁定，请解锁后再操作。")
+                        return HttpResponse("请输入正确的手机号！")
                 except:
                     try:
-                        phoneMessage = models.phone_message.objects.get(phonenumber=request.POST['phonenumber'],
-                                                                        mcodestatus=1)  # 判断是否有短信验证码
-                        return HttpResponse(phoneMessage.messagecode)
+                        if "@" in request.POST['email']:
+                            try:
+                                eMail = models.mail.objects.get(email=request.POST['email'], ecodestatus=1)#判断是否有验证码
+                                return HttpResponse(eMail.emailcode)
+                            except:
+                                return HttpResponse("没有获取到邮箱验证码，请重试。")
+                        else:
+                            return HttpResponse("请输入正确的邮箱地址！")
                     except:
-                        return HttpResponse("没有获取到验证码，请重试。")
+                        return HttpResponse("请输入邮箱或者手机号。")
 
     else:
         return HttpResponse("请求方式错误！")
+
 #注册接口
+
