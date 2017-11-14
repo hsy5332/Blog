@@ -5,6 +5,23 @@ from django.shortcuts import render
 
 from Blog import models
 
+'''
+接口规范：
+返回数据
+失败：
+{
+    "code":"",
+    "msg" : "",
+}
+
+{   
+    "code" : "",
+    "msg" : "",
+    "data1" : "data1",
+    data2" : "data2",
+    data3" : "data3"
+}
+'''
 
 def index(request):
     user = models.user.objects.get(id=1)
