@@ -1,5 +1,7 @@
 import time
 import json
+import pdb
+#pdb.set_trace()
 from django.http import HttpResponse
 from django.shortcuts import render
 
@@ -58,7 +60,7 @@ def login(request):
                         'code': '200',
                         'msg': 'Success！',
                         'data': {'userid': userinfo.id, 'username': userinfo.username,
-                                 'phonenumber': userinfo.phonenumber, }#实际开发中，可直接返回一个字典
+                                 'phonenumber': userinfo.phonenumber, }  # 实际开发中，可直接返回一个字典
                     }
                     return HttpResponse(json.dumps(login_userinfo))
                 except:
@@ -71,7 +73,8 @@ def login(request):
             login_tokenError = {'code': "-10", 'msg': 'ERROR', 'data': ''}
             return HttpResponse(json.dumps(login_tokenError))
     else:
-        return HttpResponse("请求方式错误！")
+        login_requesterror = {'code': '-12', 'msg': '请求方式错误！', 'data': ''}
+        return HttpResponse(json.dumps(login_requesterror))
 
 
 # 登录接口
@@ -81,12 +84,12 @@ def register(request):
     if request.POST:
         try:
             postUsername = models.user.objects.get(username=request.POST['username'])  # 这个就能判断用户名是否存在
-            register_userInfoerror = {'code':'202','msg':'该用户名已经存在！','data':''}
+            register_userInfoerror = {'code': '202', 'msg': '该用户名已经存在！', 'data': ''}
             return HttpResponse(json.dumps(register_userInfoerror))
         except:
             try:
                 phonenumber = models.user.objects.get(phonenumber=request.POST['phonenumber'])
-                register_phoneNumberoccupy = {'code':'203','msg':'该手机号已经使用了！','data':''} #Occupy占用
+                register_phoneNumberoccupy = {'code': '203', 'msg': '该手机号已经使用了！', 'data': ''}  # Occupy占用
                 return HttpResponse(json.dumps(register_phoneNumberoccupy))
             except:
                 try:
@@ -97,49 +100,63 @@ def register(request):
                             if int(phoneStatus.status) == 1:  # 判断手机号是否被锁定
                                 try:
                                     phoneMessage = models.phone_message.objects.get(
-                                        phonenumber=request.POST['phonenumber'], mcodestatus=1)  # 判断phoneMessage是否有短信验证码
-                                    register_messagecode = {'code':'200','msg':'Success！','data':phoneMessage.messagecode}
+                                        phonenumber=request.POST['phonenumber'], mcodestatus=1,
+                                        usein='R')  # 判断phoneMessage是否有短信验证码
+                                    register_messagecode = {'code': '200', 'msg': 'Success！',
+                                                            'data': phoneMessage.messagecode}
                                     return HttpResponse(json.dumps(register_messagecode))
                                 except:
-                                    register_notReceivedcode = {'code':'204', 'msg':'没有获取到手机验证码，请重试。', 'data':''}#Receive收到
+                                    register_notReceivedcode = {'code': '204', 'msg': '没有获取到手机验证码，请重试。',
+                                                                'data': ''}  # Receive收到
                                     return HttpResponse(json.dumps(register_notReceivedcode))
                             else:
-                                register_phonelocking = {'code':'205', 'msg':'该手机号已经被锁定，请解锁后再操作。', 'data':''}
+                                register_phonelocking = {'code': '205', 'msg': '该手机号已经被锁定，请解锁后再操作。', 'data': ''}
                                 return HttpResponse(json.dumps(register_phonelocking))
                         except:
                             try:
-                                phoneMessage = models.phone_message.objects.get(phonenumber=request.POST['phonenumber'],
-                                                                                mcodestatus=1)  # 判断phoneMessage是否有短信验证码
+                                phoneMessage = models.phone_message.objects.get(
+                                    phonenumber=request.POST['phonenumber'],
+                                    mcodestatus=1, usein='R')  # 判断phoneMessage是否有短信验证码
                                 register_messagecode = {'code': '200', 'msg': 'Success！',
-                                                        'data': phoneMessage.messagecode}
+                                                            'data': phoneMessage.messagecode}
                                 return HttpResponse(json.dumps(register_messagecode))
                             except:
                                 register_notReceivedcode = {'code': '204', 'msg': '没有获取到手机验证码，请重试。',
                                                             'data': ''}  # Receive收到
-                                return HttpResponse(register_notReceivedcode)
+                                return HttpResponse (json.dumps(register_notReceivedcode))
                     else:
-                        register_Phonewrongful = {'code':'206', 'msg':'请输入正确的手机号！', 'data':''} #wrongful不合法
+                        register_Phonewrongful = {'code': '206', 'msg': '请输入正确的手机号！', 'data': ''}  # wrongful不合法
                         return HttpResponse(json.dumps(register_Phonewrongful))
                 except:
                     try:
                         if "@" in request.POST['email']:
                             try:
-                                eMail = models.mail.objects.get(email=request.POST['email'], ecodestatus=1)  # 判断是否有验证码
-                                register_mailcode = {'code':'200', 'msg':'Success', 'data':eMail.emailcode}
+                                eMail = models.mail.objects.get(email=request.POST['email'], ecodestatus=1 ,usein = 'R')  # 判断是否有验证码
+                                register_mailcode = {'code': '200', 'msg': 'Success', 'data': eMail.emailcode}
                                 return HttpResponse(json.dumps(register_mailcode))
                             except:
                                 register_notReceivedMailcode = {'code': '207', 'msg': '没有获取到邮箱验证码，请重试。',
-                                                            'data': ''}
+                                                                'data': ''}
                                 return HttpResponse(json.dumps(register_notReceivedMailcode))
                         else:
-                            register_mailwrongful = {'code':'208', 'msg':'请输入正确的邮箱地址！', 'data':''}
+                            register_mailwrongful = {'code': '208', 'msg': '请输入正确的邮箱地址！', 'data': ''}
                             return HttpResponse(json.dumps(register_mailwrongful))
                     except:
-                        register_mailPhonewrongful =  {'code':'209', 'msg':'请输入邮箱或者手机号！', 'data':''}
+                        register_mailPhonewrongful = {'code': '209', 'msg': '请输入邮箱或者手机号！', 'data': ''}
                         return HttpResponse(json.dumps(register_mailPhonewrongful))
 
     else:
-        register_requesterror = {'code':'-12', 'msg':'请求方式错误！', 'data':''}
+        register_requesterror = {'code': '-12', 'msg': '请求方式错误！', 'data': ''}
         return HttpResponse(json.dumps(register_requesterror))
 
+
 # 注册接口
+'''
+def forgotpassword(request):
+    if request.POST:
+        try:
+            forgotusername = models.user.objects.get(username=request.POST['username'],)
+
+        except:
+            print("用户错误")
+'''
