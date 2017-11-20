@@ -21,7 +21,7 @@ from Blog import models
 
 {   
     "code" : "",
-    "msg" : "",
+    "msg" : "", 
     "data1" : "data1",
     data2" : "data2",
     data3" : "data3"
@@ -60,12 +60,12 @@ def login(request):
                                                        password=request.POST['password'])
                     # 判断用户信息是否在数据库中存在
                     # return HttpResponse("Success！")
+                    # 返回json字符串方法：  (实际开发可以不返回，前端根据userinfo取出对应value)
 
-                    # 返回json字符串方法：            (实际开发可以不返回，前端根据userinfo取出对应value)
                     login_userinfo = {
                         'code': '200',
                         'msg': 'Success！',
-                        'data': {'userid': userinfo.id, 'username': userinfo.username,
+                        'data': {'userid': str(userinfo.id), 'username': userinfo.username,
                                  'phonenumber': userinfo.phonenumber, }  # 实际开发中，可直接返回一个字典
                     }
                     return HttpResponse(json.dumps(login_userinfo))
@@ -104,13 +104,37 @@ def register(request):
                             phoneStatus = models.phone_status.objects.get(
                                 phonenumber=request.POST['phonenumber'])  # 判断手机号是否存在phone_status表中
                             if int(phoneStatus.status) == 1:  # 判断手机号是否被锁定
+                                #pdb.set_trace()
                                 try:
                                     phoneMessage = models.phone_message.objects.get(
-                                        phonenumber=request.POST['phonenumber'], mcodestatus=1,
+                                            phonenumber=request.POST['phonenumber'], mcodestatus=1,
                                         usein='R')  # 判断phoneMessage是否有短信验证码
-                                    register_messagecode = {'code': '200', 'msg': 'Success！',
-                                                            'data': phoneMessage.messagecode}
-                                    return HttpResponse(json.dumps(register_messagecode))
+                                    if 'messagecode' in request.POST:
+                                        if str(phoneMessage.messagecode) == request.POST['messagecode']:
+                                            models.user.objects.create(username=request.POST['username'],
+                                                                   password='123',
+                                                                   realname=request.POST['username'],
+                                                                   nickname=request.POST['username'],
+                                                                   phonenumber=request.POST['phonenumber'], sex='1',
+                                                                   userstatus='1',
+                                                                   birthday=time.strftime("%Y-%m-%d %H:%M:%S",
+                                                                                          time.localtime()),
+                                                                   createdtime=time.strftime("%Y-%m-%d %H:%M:%S",
+                                                                                             time.localtime()),
+                                                                   updatetime=time.strftime("%Y-%m-%d %H:%M:%S",
+                                                                                            time.localtime()))
+                                            models.phone_message.objects.filter(phonenumber=request.POST['phonenumber']).update(
+                                            mcodestatus='0',updatetime=time.strftime("%Y-%m-%d %H:%M:%S",
+                                                                                            time.localtime()))
+                                            register_messagecode = {'code': '200', 'msg': 'Success！',
+                                                                'data': ''}
+                                            return HttpResponse(json.dumps(register_messagecode))
+                                        else :
+                                            register_phoneNumbererror = {'code' : '214', 'msg' : '请输入正确的手机验证码!', 'data' : ''}
+                                            return HttpResponse(json.dumps(register_phoneNumbererror))
+                                    else:
+                                        register_notMessagecode = {'code': '-10', 'msg': 'ERROR', 'data': ''}
+                                        return HttpResponse(json.dumps(register_notMessagecode))
                                 except:
                                     register_notReceivedcode = {'code': '204', 'msg': '没有获取到手机验证码，请重试。',
                                                                 'data': ''}  # Receive收到
@@ -123,9 +147,33 @@ def register(request):
                                 phoneMessage = models.phone_message.objects.get(
                                     phonenumber=request.POST['phonenumber'],
                                     mcodestatus=1, usein='R')  # 判断phoneMessage是否有短信验证码
-                                register_messagecode = {'code': '200', 'msg': 'Success！',
-                                                        'data': phoneMessage.messagecode}
-                                return HttpResponse(json.dumps(register_messagecode))
+                                if 'messagecode' in request.POST:
+                                    if str(phoneMessage.messagecode) == request.POST['messagecode']:
+                                        models.user.objects.create(username=request.POST['username'],
+                                                                   password='123',
+                                                                   realname=request.POST['username'],
+                                                                   nickname=request.POST['username'],
+                                                                   phonenumber=request.POST['phonenumber'], sex='1',
+                                                                   userstatus='1',
+                                                                   birthday=time.strftime("%Y-%m-%d %H:%M:%S",
+                                                                                          time.localtime()),
+                                                                   createdtime=time.strftime("%Y-%m-%d %H:%M:%S",
+                                                                                             time.localtime()),
+                                                                   updatetime=time.strftime("%Y-%m-%d %H:%M:%S",
+                                                                                            time.localtime()))
+                                        models.phone_message.objects.filter(
+                                            phonenumber=request.POST['phonenumber']).update(
+                                            mcodestatus='0', updatetime=time.strftime("%Y-%m-%d %H:%M:%S",
+                                                                                      time.localtime()))
+                                        register_messagecode = {'code': '200', 'msg': 'Success！',
+                                                                'data': ''}
+                                        return HttpResponse(json.dumps(register_messagecode))
+                                    else:
+                                        register_phoneNumbererror = {'code': '214', 'msg': '请输入正确的手机验证码!', 'data': ''}
+                                        return HttpResponse(json.dumps(register_phoneNumbererror))
+                                else:
+                                    register_notMessagecode = {'code': '-10', 'msg': 'ERROR', 'data': ''}
+                                    return HttpResponse(json.dumps(register_notMessagecode))
                             except:
                                 register_notReceivedcode = {'code': '204', 'msg': '没有获取到手机验证码，请重试。',
                                                             'data': ''}  # Receive收到
@@ -137,14 +185,41 @@ def register(request):
                     try:
                         if "@" in request.POST['email']:
                             try:
-                                eMail = models.mail.objects.get(email=request.POST['email'], ecodestatus=1,
-                                                                usein='R')  # 判断是否有验证码
-                                register_mailcode = {'code': '200', 'msg': 'Success', 'data': eMail.emailcode}
-                                return HttpResponse(json.dumps(register_mailcode))
+                                if models.user.objects.filter(emailaddress=request.POST['email']) :
+                                    register_errorMail = {'code': '213', 'msg': '邮箱已经存在!', 'data': ''}
+                                    return HttpResponse(json.dumps(register_errorMail))
+                                else:
+                                    try:
+                                        eMail = models.mail.objects.get(email=request.POST['email'], ecodestatus=1,
+                                                                        usein='R')  # 判断是否有验证码
+                                        if str(eMail.emailcode) == request.POST['emailcode']:
+                                            models.user.objects.create(username=request.POST['username'],
+                                                                       password='123',
+                                                                       realname=request.POST['username'],
+                                                                       nickname=request.POST['username'],
+                                                                       emailaddress=request.POST['email'], sex='1',
+                                                                       userstatus='1',
+                                                                       birthday=time.strftime("%Y-%m-%d %H:%M:%S",
+                                                                                              time.localtime()),
+                                                                       createdtime=time.strftime("%Y-%m-%d %H:%M:%S",
+                                                                                                 time.localtime()),
+                                                                       updatetime=time.strftime("%Y-%m-%d %H:%M:%S",
+                                                                                                time.localtime()))
+                                            models.mail.objects.filter(email=request.POST['email']).update(
+                                                ecodestatus='0',updatetime=time.strftime("%Y-%m-%d %H:%M:%S",
+                                                                                            time.localtime()))
+                                            register_Mailcode = {'code': '200', 'msg': 'Success', 'data': ''}
+                                            return HttpResponse(json.dumps(register_Mailcode))
+                                        else:
+                                            register_errorMailcode = {'code': '212', 'msg': '请输入正确的邮箱验证码!', 'data': ''}
+                                            return HttpResponse(json.dumps(register_errorMailcode))
+                                    except:
+                                        register_notReceivedMailcode = {'code': '207', 'msg': '没有获取到邮箱验证码，请重试。',
+                                                                        'data': ''}
+                                        return HttpResponse(json.dumps(register_notReceivedMailcode))
                             except:
-                                register_notReceivedMailcode = {'code': '207', 'msg': '没有获取到邮箱验证码，请重试。',
-                                                                'data': ''}
-                                return HttpResponse(json.dumps(register_notReceivedMailcode))
+                                register_mailwrongful = {'code': '208', 'msg': '请输入正确的邮箱地址！', 'data': ''}
+                                return HttpResponse(json.dumps(register_mailwrongful))
                         else:
                             register_mailwrongful = {'code': '208', 'msg': '请输入正确的邮箱地址！', 'data': ''}
                             return HttpResponse(json.dumps(register_mailwrongful))
@@ -253,40 +328,48 @@ def achievemessagecode(request):
         if 'usein' in request.POST and 'phonenumber' in request.POST:
             if request.POST['usein'] == 'R' and len(
                     request.POST['phonenumber']) >= 11:  # 注册 and request.POST['operator'] == 'juhe' 后期不同运营，搭配使用
-                    #achievemessagecode_sendsms = sendsms(sendsmsconfigure.get('appkey'), sendsmsconfigure.get('mobile'), sendsmsconfigure.get('tpl_id'),sendsmsconfigure.get('tpl_value'))
-                    #if 'smsid' in achievemessagecode_sendsms:#判断第三方是否获取到验证码
-                        try:
-                            models.phone_message.objects.filter(phonenumber=request.POST['phonenumber']).filter(usein='R').filter(mcodestatus=1).update(mcodestatus=0,updatetime=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())) #更新数据库usein='R',mcodestatus=1的数据把mcodestatus=0
-                            models.phone_message.objects.create(phonenumber=request.POST['phonenumber'], messagecode=randintnumber,usein='R', mcodestatus=1,createdtime=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),updatetime=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))#创建数据，生成验证码
-                            achievemessagecode_success = {'code' : '200', 'msg' : 'Success！', 'data' : ''}
-                            return HttpResponse(json.dumps(achievemessagecode_success))
-                        except:
-                            achievemessagecode_createdDataerror = {'code' : '-13', 'msg' : 'ERROR！', 'data' : ''}
-                            return HttpResponse(json.dumps(achievemessagecode_createdDataerror))
-                    #else:
-                        #achievemessagecode_sendsmserror = {'code' : '204', 'msg' : '没有获取到手机验证码，请重试', 'data' : ''}
-                        #return HttpResponse(json.dumps(achievemessagecode_sendsmserror))
-                    #上面注释的代码 是获取第三方的code，所有注释，记得删除
+                # achievemessagecode_sendsms = sendsms(sendsmsconfigure.get('appkey'), sendsmsconfigure.get('mobile'), sendsmsconfigure.get('tpl_id'),sendsmsconfigure.get('tpl_value'))
+                # if 'smsid' in achievemessagecode_sendsms:#判断第三方是否获取到验证码
+                try:
+                    models.phone_message.objects.filter(phonenumber=request.POST['phonenumber']).filter(
+                        usein='R').filter(mcodestatus=1).update(mcodestatus=0,
+                                                                updatetime=time.strftime("%Y-%m-%d %H:%M:%S",
+                                                                                         time.localtime()))  # 更新数据库usein='R',mcodestatus=1的数据把mcodestatus=0
+                    models.phone_message.objects.create(phonenumber=request.POST['phonenumber'],
+                                                        messagecode=randintnumber, usein='R', mcodestatus=1,
+                                                        createdtime=time.strftime("%Y-%m-%d %H:%M:%S",
+                                                                                  time.localtime()),
+                                                        updatetime=time.strftime("%Y-%m-%d %H:%M:%S",
+                                                                                 time.localtime()))  # 创建数据，生成验证码
+                    achievemessagecode_success = {'code': '200', 'msg': 'Success！', 'data': ''}
+                    return HttpResponse(json.dumps(achievemessagecode_success))
+                except:
+                    achievemessagecode_createdDataerror = {'code': '-13', 'msg': 'ERROR！', 'data': ''}
+                    return HttpResponse(json.dumps(achievemessagecode_createdDataerror))
+                    # else:
+                    # achievemessagecode_sendsmserror = {'code' : '204', 'msg' : '没有获取到手机验证码，请重试', 'data' : ''}
+                    # return HttpResponse(json.dumps(achievemessagecode_sendsmserror))
+                    # 上面注释的代码 是获取第三方的code，所有注释，记得删除
             elif request.POST['usein'] == 'F' and len(request.POST['phonenumber']) >= 11:  # 忘记密码
                 # achievemessagecode_sendsms = sendsms(sendsmsconfigure.get('appkey'), sendsmsconfigure.get('mobile'), sendsmsconfigure.get('tpl_id'),sendsmsconfigure.get('tpl_value'))
                 # if 'smsid' in achievemessagecode_sendsms:#判断第三方是否获取到验证码
-                    try:
-                        models.phone_message.objects.filter(phonenumber=request.POST['phonenumber']).filter(
-                            usein='F').filter(mcodestatus=1).update(mcodestatus=0,
+                try:
+                    models.phone_message.objects.filter(phonenumber=request.POST['phonenumber']).filter(
+                        usein='F').filter(mcodestatus=1).update(mcodestatus=0,
                                                                 updatetime=time.strftime("%Y-%m-%d %H:%M:%S",
                                                                                          time.localtime()))  # 更新数据库usein='F',mcodestatus=1的数据把mcodestatus=0
-                        models.phone_message.objects.create(phonenumber=request.POST['phonenumber'],
+                    models.phone_message.objects.create(phonenumber=request.POST['phonenumber'],
                                                         messagecode=randintnumber, usein='F', mcodestatus=1,
                                                         createdtime=time.strftime("%Y-%m-%d %H:%M:%S",
                                                                                   time.localtime()),
                                                         updatetime=time.strftime("%Y-%m-%d %H:%M:%S",
                                                                                  time.localtime()))  # 创建数据，生成验证码
-                        achievemessagecode_success = {'code': '200', 'msg': 'Success！', 'data': ''}
-                        return HttpResponse(json.dumps(achievemessagecode_success))
-                    except:
-                        achievemessagecode_createdDataerror = {'code': '-13', 'msg': 'ERROR！', 'data': ''}
-                        return HttpResponse(json.dumps(achievemessagecode_createdDataerror))
-                # else:
+                    achievemessagecode_success = {'code': '200', 'msg': 'Success！', 'data': ''}
+                    return HttpResponse(json.dumps(achievemessagecode_success))
+                except:
+                    achievemessagecode_createdDataerror = {'code': '-13', 'msg': 'ERROR！', 'data': ''}
+                    return HttpResponse(json.dumps(achievemessagecode_createdDataerror))
+                    # else:
                     # achievemessagecode_sendsmserror = {'code' : '204', 'msg' : '没有获取到手机验证码，请重试', 'data' : ''}
                     # return HttpResponse(json.dumps(achievemessagecode_sendsmserror))
             elif request.POST['usein'] == 'M':  # 修改密码
@@ -308,17 +391,22 @@ def achievemessagecode(request):
                 except:
                     achievemessagecode_createdDataerror = {'code': '-13', 'msg': 'ERROR！', 'data': ''}
                     return HttpResponse(json.dumps(achievemessagecode_createdDataerror))
-                # else:
+                    # else:
                     # achievemessagecode_sendsmserror = {'code' : '204', 'msg' : '没有获取到手机验证码，请重试', 'data' : ''}
                     # return HttpResponse(json.dumps(achievemessagecode_sendsmserror))
             else:
                 achieveMessagecode_requesterror = {'code': '-10', 'msg': 'ERROR！', 'data': ''}
                 return HttpResponse(json.dumps(achieveMessagecode_requesterror))
-        elif 'usein' in request.POST and 'email' in request.POST :
+        elif 'usein' in request.POST and 'email' in request.POST:
             if '@' in request.POST['email'] and request.POST['usein'] == 'R':
                 try:
-                    models.mail.objects.filter(email=request.POST['email']).filter(ecodestatus=1).filter(usein='R').update(ecodestatus=0, updatetime=time.strftime("%Y-%m-%d %H:%M:%S",time.localtime()))#更新数据库 userin='R' ecodestatus=1的数据
-                    models.mail.objects.create(email=request.POST['email'], emailcode=randintnumber, ecodestatus=1, usein='R',createdtime=time.strftime("%Y-%m-%d %H:%M:%S",time.localtime()), updatetime=time.strftime("%Y-%m-%d %H:%M:%S",time.localtime()))#插入数据
+                    models.mail.objects.filter(email=request.POST['email']).filter(ecodestatus=1).filter(
+                        usein='R').update(ecodestatus=0, updatetime=time.strftime("%Y-%m-%d %H:%M:%S",
+                                                                                  time.localtime()))  # 更新数据库 userin='R' ecodestatus=1的数据
+                    models.mail.objects.create(email=request.POST['email'], emailcode=randintnumber, ecodestatus=1,
+                                               usein='R',
+                                               createdtime=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
+                                               updatetime=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))  # 插入数据
                     achievemessagecode_success = {'code': '200', 'msg': 'Success！', 'data': ''}
                     return HttpResponse(json.dumps(achievemessagecode_success))
                 except:
@@ -326,8 +414,13 @@ def achievemessagecode(request):
                     return HttpResponse(json.dumps(achievemessagecode_createdDataerror))
             elif '@' in request.POST['email'] and request.POST['usein'] == 'F':
                 try:
-                    models.mail.objects.filter(email=request.POST['email']).filter(ecodestatus=1).filter(usein='F').update(ecodestatus=0, updatetime=time.strftime("%Y-%m-%d %H:%M:%S",time.localtime()))#更新数据库 userin='F' ecodestatus=1的数据
-                    models.mail.objects.create(email=request.POST['email'], emailcode=randintnumber, ecodestatus=1, usein='F',createdtime=time.strftime("%Y-%m-%d %H:%M:%S",time.localtime()), updatetime=time.strftime("%Y-%m-%d %H:%M:%S",time.localtime()))#插入数据
+                    models.mail.objects.filter(email=request.POST['email']).filter(ecodestatus=1).filter(
+                        usein='F').update(ecodestatus=0, updatetime=time.strftime("%Y-%m-%d %H:%M:%S",
+                                                                                  time.localtime()))  # 更新数据库 userin='F' ecodestatus=1的数据
+                    models.mail.objects.create(email=request.POST['email'], emailcode=randintnumber, ecodestatus=1,
+                                               usein='F',
+                                               createdtime=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
+                                               updatetime=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))  # 插入数据
                     achievemessagecode_success = {'code': '200', 'msg': 'Success！', 'data': ''}
                     return HttpResponse(json.dumps(achievemessagecode_success))
                 except:
@@ -335,8 +428,13 @@ def achievemessagecode(request):
                     return HttpResponse(json.dumps(achievemessagecode_createdDataerror))
             elif '@' in request.POST['email'] and request.POST['usein'] == 'M':
                 try:
-                    models.mail.objects.filter(email=request.POST['email']).filter(ecodestatus=1).filter(usein='M').update(ecodestatus=0, updatetime=time.strftime("%Y-%m-%d %H:%M:%S",time.localtime()))#更新数据库 userin='M' ecodestatus=1的数据
-                    models.mail.objects.create(email=request.POST['email'], emailcode=randintnumber, ecodestatus=1, usein='M',createdtime=time.strftime("%Y-%m-%d %H:%M:%S",time.localtime()), updatetime=time.strftime("%Y-%m-%d %H:%M:%S",time.localtime()))#插入数据
+                    models.mail.objects.filter(email=request.POST['email']).filter(ecodestatus=1).filter(
+                        usein='M').update(ecodestatus=0, updatetime=time.strftime("%Y-%m-%d %H:%M:%S",
+                                                                                  time.localtime()))  # 更新数据库 userin='M' ecodestatus=1的数据
+                    models.mail.objects.create(email=request.POST['email'], emailcode=randintnumber, ecodestatus=1,
+                                               usein='M',
+                                               createdtime=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
+                                               updatetime=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))  # 插入数据
                     achievemessagecode_success = {'code': '200', 'msg': 'Success！', 'data': ''}
                     return HttpResponse(json.dumps(achievemessagecode_success))
                 except:
