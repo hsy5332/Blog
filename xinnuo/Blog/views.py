@@ -73,13 +73,13 @@ def login(request):
                     login_userInfoerror = {'code': '201', 'msg': '用户名或密码错误！', 'data': ''}
                     return HttpResponse(json.dumps(login_userInfoerror))
             else:
-                login_tokenInvalid = {'code': '-11', 'msg': '', 'data': 'token过期'}
+                login_tokenInvalid = {"code" :  "-11" , "msg" :  "token过期", "data": {}}
                 return HttpResponse(json.dumps(login_tokenInvalid))
         except:
             login_tokenError = {'code': "-10", 'msg': 'ERROR', 'data': ''}
             return HttpResponse(json.dumps(login_tokenError))
     else:
-        login_requesterror = {'code': '-12', 'msg': '请求方式错误！', 'data': ''}
+        login_requesterror = {"code": "-12", "msg": "请求方式错误！", "data": {}}
         return HttpResponse(json.dumps(login_requesterror))
 
 
@@ -104,33 +104,35 @@ def register(request):
                             phoneStatus = models.phone_status.objects.get(
                                 phonenumber=request.POST['phonenumber'])  # 判断手机号是否存在phone_status表中
                             if int(phoneStatus.status) == 1:  # 判断手机号是否被锁定
-                                #pdb.set_trace()
+                                # pdb.set_trace()
                                 try:
                                     phoneMessage = models.phone_message.objects.get(
-                                            phonenumber=request.POST['phonenumber'], mcodestatus=1,
+                                        phonenumber=request.POST['phonenumber'], mcodestatus=1,
                                         usein='R')  # 判断phoneMessage是否有短信验证码
                                     if 'messagecode' in request.POST:
                                         if str(phoneMessage.messagecode) == request.POST['messagecode']:
                                             models.user.objects.create(username=request.POST['username'],
-                                                                   password='123',
-                                                                   realname=request.POST['username'],
-                                                                   nickname=request.POST['username'],
-                                                                   phonenumber=request.POST['phonenumber'], sex='1',
-                                                                   userstatus='1',
-                                                                   birthday=time.strftime("%Y-%m-%d %H:%M:%S",
-                                                                                          time.localtime()),
-                                                                   createdtime=time.strftime("%Y-%m-%d %H:%M:%S",
-                                                                                             time.localtime()),
-                                                                   updatetime=time.strftime("%Y-%m-%d %H:%M:%S",
-                                                                                            time.localtime()))
-                                            models.phone_message.objects.filter(phonenumber=request.POST['phonenumber']).update(
-                                            mcodestatus='0',updatetime=time.strftime("%Y-%m-%d %H:%M:%S",
-                                                                                            time.localtime()))
+                                                                       password='123',
+                                                                       realname=request.POST['username'],
+                                                                       nickname=request.POST['username'],
+                                                                       phonenumber=request.POST['phonenumber'], sex='1',
+                                                                       userstatus='1',
+                                                                       birthday=time.strftime("%Y-%m-%d %H:%M:%S",
+                                                                                              time.localtime()),
+                                                                       createdtime=time.strftime("%Y-%m-%d %H:%M:%S",
+                                                                                                 time.localtime()),
+                                                                       updatetime=time.strftime("%Y-%m-%d %H:%M:%S",
+                                                                                                time.localtime()))
+                                            models.phone_message.objects.filter(
+                                                phonenumber=request.POST['phonenumber']).update(
+                                                mcodestatus='0', updatetime=time.strftime("%Y-%m-%d %H:%M:%S",
+                                                                                          time.localtime()))
                                             register_messagecode = {'code': '200', 'msg': 'Success！',
-                                                                'data': ''}
+                                                                    'data': ''}
                                             return HttpResponse(json.dumps(register_messagecode))
-                                        else :
-                                            register_phoneNumbererror = {'code' : '214', 'msg' : '请输入正确的手机验证码!', 'data' : ''}
+                                        else:
+                                            register_phoneNumbererror = {'code': '214', 'msg': '请输入正确的手机验证码!',
+                                                                         'data': ''}
                                             return HttpResponse(json.dumps(register_phoneNumbererror))
                                     else:
                                         register_notMessagecode = {'code': '-10', 'msg': 'ERROR', 'data': ''}
@@ -185,7 +187,7 @@ def register(request):
                     try:
                         if "@" in request.POST['email']:
                             try:
-                                if models.user.objects.filter(emailaddress=request.POST['email']) :
+                                if models.user.objects.filter(emailaddress=request.POST['email']):
                                     register_errorMail = {'code': '213', 'msg': '邮箱已经存在!', 'data': ''}
                                     return HttpResponse(json.dumps(register_errorMail))
                                 else:
@@ -206,8 +208,8 @@ def register(request):
                                                                        updatetime=time.strftime("%Y-%m-%d %H:%M:%S",
                                                                                                 time.localtime()))
                                             models.mail.objects.filter(email=request.POST['email']).update(
-                                                ecodestatus='0',updatetime=time.strftime("%Y-%m-%d %H:%M:%S",
-                                                                                            time.localtime()))
+                                                ecodestatus='0', updatetime=time.strftime("%Y-%m-%d %H:%M:%S",
+                                                                                          time.localtime()))
                                             register_Mailcode = {'code': '200', 'msg': 'Success', 'data': ''}
                                             return HttpResponse(json.dumps(register_Mailcode))
                                         else:
@@ -228,7 +230,7 @@ def register(request):
                         return HttpResponse(json.dumps(register_mailPhonewrongful))
 
     else:
-        register_requesterror = {'code': '-12', 'msg': '请求方式错误！', 'data': ''}
+        register_requesterror = {"code": "-12", "msg": "请求方式错误！", "data": {}}
         return HttpResponse(json.dumps(register_requesterror))
 
 
@@ -282,7 +284,7 @@ def forgotpassword(request):
                 forgotpassword_mailerror = {'code': '208', 'msg': '请输入正确的邮箱地址！', 'data': ''}
                 return HttpResponse(json.dumps(forgotpassword_mailerror))
         else:
-            forgotpassword_requestwrong = {'code': '-12', 'msg': '请求方式错误', 'data': ''}
+            forgotpassword_requestwrong = {"code": "-12", "msg": "请求方式错误！", "data": {}}
             return HttpResponse(json.dumps(forgotpassword_requestwrong))
 
 
@@ -344,7 +346,7 @@ def achievemessagecode(request):
                     achievemessagecode_success = {'code': '200', 'msg': 'Success！', 'data': ''}
                     return HttpResponse(json.dumps(achievemessagecode_success))
                 except:
-                    achievemessagecode_createdDataerror = {'code': '-13', 'msg': 'ERROR！', 'data': ''}
+                    achievemessagecode_createdDataerror = {"code": "-13", "msg": "ERROR！", "data": {}}
                     return HttpResponse(json.dumps(achievemessagecode_createdDataerror))
                     # else:
                     # achievemessagecode_sendsmserror = {'code' : '204', 'msg' : '没有获取到手机验证码，请重试', 'data' : ''}
@@ -367,7 +369,7 @@ def achievemessagecode(request):
                     achievemessagecode_success = {'code': '200', 'msg': 'Success！', 'data': ''}
                     return HttpResponse(json.dumps(achievemessagecode_success))
                 except:
-                    achievemessagecode_createdDataerror = {'code': '-13', 'msg': 'ERROR！', 'data': ''}
+                    achievemessagecode_createdDataerror = {"code": "-13", "msg": "ERROR！", "data": {}}
                     return HttpResponse(json.dumps(achievemessagecode_createdDataerror))
                     # else:
                     # achievemessagecode_sendsmserror = {'code' : '204', 'msg' : '没有获取到手机验证码，请重试', 'data' : ''}
@@ -389,7 +391,7 @@ def achievemessagecode(request):
                     achievemessagecode_success = {'code': '200', 'msg': 'Success！', 'data': ''}
                     return HttpResponse(json.dumps(achievemessagecode_success))
                 except:
-                    achievemessagecode_createdDataerror = {'code': '-13', 'msg': 'ERROR！', 'data': ''}
+                    achievemessagecode_createdDataerror = {"code": "-13", "msg": "ERROR！", "data": {}}
                     return HttpResponse(json.dumps(achievemessagecode_createdDataerror))
                     # else:
                     # achievemessagecode_sendsmserror = {'code' : '204', 'msg' : '没有获取到手机验证码，请重试', 'data' : ''}
@@ -410,7 +412,7 @@ def achievemessagecode(request):
                     achievemessagecode_success = {'code': '200', 'msg': 'Success！', 'data': ''}
                     return HttpResponse(json.dumps(achievemessagecode_success))
                 except:
-                    achievemessagecode_createdDataerror = {'code': '-13', 'msg': 'ERROR！', 'data': ''}
+                    achievemessagecode_createdDataerror = {"code": "-13", "msg": "ERROR！", "data": {}}
                     return HttpResponse(json.dumps(achievemessagecode_createdDataerror))
             elif '@' in request.POST['email'] and request.POST['usein'] == 'F':
                 try:
@@ -424,7 +426,7 @@ def achievemessagecode(request):
                     achievemessagecode_success = {'code': '200', 'msg': 'Success！', 'data': ''}
                     return HttpResponse(json.dumps(achievemessagecode_success))
                 except:
-                    achievemessagecode_createdDataerror = {'code': '-13', 'msg': 'ERROR！', 'data': ''}
+                    achievemessagecode_createdDataerror = {"code": "-13", "msg": "ERROR！", "data": {}}
                     return HttpResponse(json.dumps(achievemessagecode_createdDataerror))
             elif '@' in request.POST['email'] and request.POST['usein'] == 'M':
                 try:
@@ -438,7 +440,7 @@ def achievemessagecode(request):
                     achievemessagecode_success = {'code': '200', 'msg': 'Success！', 'data': ''}
                     return HttpResponse(json.dumps(achievemessagecode_success))
                 except:
-                    achievemessagecode_createdDataerror = {'code': '-13', 'msg': 'ERROR！', 'data': ''}
+                    achievemessagecode_createdDataerror = {"code": "-13", "msg": "ERROR！", "data": {}}
                     return HttpResponse(json.dumps(achievemessagecode_createdDataerror))
             else:
                 register_mailwrongful = {'code': '208', 'msg': '请输入正确的邮箱地址！', 'data': ''}
@@ -447,5 +449,52 @@ def achievemessagecode(request):
             achieveMessagecode_requesterror = {'code': '-10', 'msg': 'ERROR！', 'data': ''}
             return HttpResponse(json.dumps(achieveMessagecode_requesterror))
     else:
-        achieveMessagecode_requesterror = {'code': '-12', 'msg': '请求方式错误！', 'data': ''}
+        achieveMessagecode_requesterror = {"code": "-12", "msg": "请求方式错误！", "data": {}}
         return HttpResponse(json.dumps(achieveMessagecode_requesterror))
+
+
+def configure(request):
+    if request.POST:
+        try:
+            configureinfo = models.link_configure.objects.get(position=request.POST['position'],
+                                                              number=request.POST['number'], configurestatus=1)
+            configure_info = {
+                "code": "200",
+                "msg": "Success！",
+                "data": [{
+                    "position": configureinfo.position,
+                    "number": configureinfo.number,
+                    "url": configureinfo.url,
+                    "picture": configureinfo.picture
+                }
+                ]
+            }
+            return HttpResponse(json.dumps(configure_info))
+        except:
+            configure_createdDataerror = {"code": "-10", "msg": "ERROR！", "data": {}}
+            return HttpResponse(json.dumps(configure_createdDataerror))
+    else:
+        configure_requesterror = {"code": "-12", "msg": "请求方式错误！", "data": {}}
+        return HttpResponse(json.dumps(configure_requesterror))
+
+def search(request):
+    if request.POST:
+        if int(request.POST['token']) + 86400 > int(time.time()):  # 86400是一天的时间戳
+            try:
+                A= models.article.objects.filter(articletitle__contains=request.POST['keyword'])
+                print(models.article.objects.filter(articletitle__contains=request.POST['keyword']))
+                c = []
+                for x in A:
+                    b = x.articleid,x.articletitle,x.articlecontent,x.authorid,
+                    c.append(b)
+                print(c)
+                return HttpResponse("sss")
+            except:
+                search_createdDataerror = {"code": "-10", "msg": "ERROR！", "data": {}}
+                return HttpResponse(json.dumps(search_createdDataerror))
+        else:
+            search_tokenInvalid = {"code" :  "-11" , "msg" :  "token过期", "data": {}}
+            return HttpResponse(json.dumps(search_tokenInvalid))
+    else:
+        search_requesterror = {"code": "-12", "msg": "请求方式错误！", "data": {}}
+        return HttpResponse(json.dumps(search_requesterror))
