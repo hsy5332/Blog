@@ -73,7 +73,7 @@ def login(request):
                     login_userInfoerror = {'code': '201', 'msg': '用户名或密码错误！', 'data': ''}
                     return HttpResponse(json.dumps(login_userInfoerror))
             else:
-                login_tokenInvalid = {"code" :  "-11" , "msg" :  "token过期", "data": {}}
+                login_tokenInvalid = {"code": "-11", "msg": "token过期", "data": {}}
                 return HttpResponse(json.dumps(login_tokenInvalid))
         except:
             login_tokenError = {'code': "-10", 'msg': 'ERROR', 'data': ''}
@@ -477,23 +477,39 @@ def configure(request):
         configure_requesterror = {"code": "-12", "msg": "请求方式错误！", "data": {}}
         return HttpResponse(json.dumps(configure_requesterror))
 
+
 def search(request):
     if request.POST:
         if int(request.POST['token']) + 86400 > int(time.time()):  # 86400是一天的时间戳
             try:
-                A= models.article.objects.filter(articletitle__contains=request.POST['keyword'])
-                print(models.article.objects.filter(articletitle__contains=request.POST['keyword']))
-                c = []
-                for x in A:
-                    b = x.articleid,x.articletitle,x.articlecontent,x.authorid,
-                    c.append(b)
-                print(c)
+                datasource = models.article.objects.filter(articletitle__contains=request.POST['keyword'],
+                                                           articlestatus=1)
+                returnkey = ["articleid", "articletitle", "articlecontent", "authorid", "author", "classifyid",
+                             "coverpicture", "createdtime", "updatetime"]
+                # 创建一个key的列表
+                returnvalues = []
+                # 创建一个values的列表
+                returndic = {}
+                # 创建字典，在遍历的时候，把单组的数据存入字典，再情清空字典
+                returndata = []
+                # 把遍历得来的字典存入列表作为返回数据
+                for x in datasource:
+                    author = models.user.objects.get(id=x.authorid)  # 查询user表，把author获取出来
+                    cachevalues = x.articleid, x.articletitle, x.articlecontent, x.authorid, author.nickname, x.classifyid, x.classifyid, x.coverpicture, x.createdtime, x.updatetime
+                    returnvalues.append(cachevalues)
+                for j in returnvalues:
+                    for a, b in zip(j, returnkey):
+                        returndic[b] = a
+                    returndata.append(returndic)
+                    returndic = {}
+                # 三个for循环实现 返回数据（returndata）
+                search_data = {"code": "200", "msg": "Success！", "data": returndata}
                 return HttpResponse("sss")
             except:
                 search_createdDataerror = {"code": "-10", "msg": "ERROR！", "data": {}}
                 return HttpResponse(json.dumps(search_createdDataerror))
         else:
-            search_tokenInvalid = {"code" :  "-11" , "msg" :  "token过期", "data": {}}
+            search_tokenInvalid = {"code": "-11", "msg": "token过期", "data": {}}
             return HttpResponse(json.dumps(search_tokenInvalid))
     else:
         search_requesterror = {"code": "-12", "msg": "请求方式错误！", "data": {}}
