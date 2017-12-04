@@ -10,38 +10,6 @@ from random import randint  # random.randint是随机取数的，发送短信的
 
 from Blog import models
 
-'''
-接口规范：
-返回数据
-失败：
-{
-    "code":"",
-    "msg" : "",
-}
-
-{   
-    "code" : "",
-    "msg" : "", 
-    "data1" : "data1",
-    data2" : "data2",
-    data3" : "data3"
-}
-code = 200 成功
-code = -10 参数未传全
-code = 201 用户名或密码错误
-code = -11 token过期
-code = -12 请求方式错误
-code = 202 用户名已经存在
-code = 203 该手机号已经使用了
-code = 204 没有获取到手机验证码，请重试 
-code = 205 该手机号已经被锁定，请解锁后再操作。
-code = 206 请输入正确的手机号
-code = 207 没有获取到邮箱验证码，请重试。
-code = 208 请输入正确的邮箱地址！
-code = 209 请输入邮箱或者手机号。
-code = 210 用户名和手机号不匹配
-'''
-
 
 def index(request):
     user = models.user.objects.get(id=1)
@@ -49,12 +17,23 @@ def index(request):
     return render(request, 'index.html', {"TEST": user})
 
 
+# token计算规则
+def token(token):
+    try:
+        if int(token) + 86400 > int(time.time()): # 86400是一天的时间戳
+            return True
+        else:
+            return False
+    except:
+        return False
+
+
 # 登录接口
 
 def login(request):
     if request.POST:
         try:
-            if int(request.POST['token']) + 86400 > int(time.time()):  # 86400是一天的时间戳
+            if token(request.POST['token']):
                 try:
                     userinfo = models.user.objects.get(username=request.POST['username'],
                                                        password=request.POST['password'])
@@ -453,6 +432,7 @@ def achievemessagecode(request):
         return HttpResponse(json.dumps(achieveMessagecode_requesterror))
 
 
+# home配置接口
 def configure(request):
     if request.POST:
         try:
@@ -478,9 +458,10 @@ def configure(request):
         return HttpResponse(json.dumps(configure_requesterror))
 
 
+# 搜索接口
 def search(request):
     if request.POST:
-        if int(request.POST['token']) + 86400 > int(time.time()):  # 86400是一天的时间戳
+        if token(request.POST['token']):
             try:
                 datasource = models.article.objects.filter(articletitle__contains=request.POST['keyword'],
                                                            articlestatus=1)
@@ -494,8 +475,12 @@ def search(request):
                 returndata = []
                 # 把遍历得来的字典存入列表作为返回数据
                 for x in datasource:
-                    author = models.user.objects.get(id=x.authorid)  # 查询user表，把author获取出来
-                    cachevalues = x.articleid, x.articletitle, x.articlecontent, x.authorid, author.nickname, x.classifyid, x.classifyid, x.coverpicture, x.createdtime, x.updatetime
+                    try:
+                        author_nickname = models.user.objects.get(
+                            id=x.authorid).nickname  # 查询user表，把author获取出来。（articleid需要转换类型）
+                    except:
+                        author_nickname = ""
+                    cachevalues = x.articleid, x.articletitle, x.articlecontent, x.authorid, author_nickname, x.classifyid, x.coverpicture, x.createdtime, x.updatetime
                     returnvalues.append(cachevalues)
                 for j in returnvalues:
                     for a, b in zip(j, returnkey):
@@ -504,7 +489,7 @@ def search(request):
                     returndic = {}
                 # 三个for循环实现 返回数据（returndata）
                 search_data = {"code": "200", "msg": "Success！", "data": returndata}
-                return HttpResponse("sss")
+                return HttpResponse(json.dumps(search_data))
             except:
                 search_createdDataerror = {"code": "-10", "msg": "ERROR！", "data": {}}
                 return HttpResponse(json.dumps(search_createdDataerror))
@@ -514,3 +499,142 @@ def search(request):
     else:
         search_requesterror = {"code": "-12", "msg": "请求方式错误！", "data": {}}
         return HttpResponse(json.dumps(search_requesterror))
+
+
+# 文章详情页接口
+def details(request):
+    if request.POST:
+        if token(request.POST['token']):
+            try:
+                articleinfo = models.article.objects.get(articleid=request.POST['articleid'])
+                author = models.user.objects.get(id=str(articleinfo.authorid))
+                articleDetailsdata = {
+                    "articleid": articleinfo.articleid,
+                    "articletitle": articleinfo.articletitle,
+                    "articlecontent": articleinfo.articlecontent,
+                    "authorid": articleinfo.authorid,
+                    "author": author.nickname,
+                    "classifyid": articleinfo.classifyid,
+                    "coverpicture": articleinfo.coverpicture,
+                    "updatetime": articleinfo.updatetime,
+                    "createdtime": articleinfo.createdtime
+                }
+                returndata = {"code": "200", "msg": "Success！", "data": articleDetailsdata}
+                return HttpResponse(json.dumps(returndata))
+            except:
+                details_createdDataerror = {"code": "-10", "msg": "ERROR！", "data": {}}
+                return HttpResponse(json.dumps(details_createdDataerror))
+        else:
+            articledetails_tokenInvalid = {"code": "-11", "msg": "token过期", "data": {}}
+            return HttpResponse(json.dumps(articledetails_tokenInvalid))
+    else:
+        articledetails_requesterror = {"code": "-12", "msg": "请求方式错误！", "data": {}}
+        return HttpResponse(json.dumps(articledetails_requesterror))
+
+
+# 创建文章
+def createarticle(request):
+    if request.POST:
+        if token(request.POST['token']):
+            try:
+                if 'coverpicture' in request.POST:
+                    models.article.objects.create(articletitle=request.POST['articletitle'],
+                                                  articlecontent=request.POST['articlecontent'],
+                                                  authorid=request.POST['authorid'],
+                                                  classifyid=request.POST['classifyid'],
+                                                  articlestatus=1,
+                                                  coverpicture=request.POST['coverpicture'],
+                                                  createdtime=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
+                                                  updatetime=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+                    createdarticle = models.article.objects.filter(authorid=request.POST['authorid']).filter(
+                        articletitle=request.POST['articletitle']).order_by('-articleid')[0]
+                    authorinfo = models.user.objects.get(id=createdarticle.authorid)
+                    Articledata = {
+                        "articleid": createdarticle.articleid,
+                        "articletitle": createdarticle.articletitle,
+                        "articlecontent": createdarticle.articlecontent,
+                        "authorid": createdarticle.authorid,
+                        "author": authorinfo.nickname,
+                        "classifyid": createdarticle.classifyid,
+                        "coverpicture": createdarticle.coverpicture,
+                        "updatetime": createdarticle.updatetime,
+                        "createdtime": createdarticle.createdtime
+                    }
+                    returnArticledata = {"code": "200", "msg": "Success！", "data": Articledata}
+                    return HttpResponse(json.dumps(returnArticledata))
+                else:
+                    models.article.objects.create(articletitle=request.POST['articletitle'],
+                                                  articlecontent=request.POST['articlecontent'],
+                                                  authorid=request.POST['authorid'],
+                                                  classifyid=request.POST['classifyid'],
+                                                  articlestatus=1,
+                                                  createdtime=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
+                                                  updatetime=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+
+                    createdarticle = models.article.objects.filter(authorid=request.POST['authorid']).filter(
+                        articletitle=request.POST['articletitle']).order_by('-articleid')[0]
+                    authorinfo = models.user.objects.get(id=createdarticle.authorid)
+                    Articledata = {
+                        "articleid": createdarticle.articleid,
+                        "articletitle": createdarticle.articletitle,
+                        "articlecontent": createdarticle.articlecontent,
+                        "authorid": createdarticle.authorid,
+                        "author": authorinfo.nickname,
+                        "classifyid": createdarticle.classifyid,
+                        "coverpicture": createdarticle.coverpicture,
+                        "updatetime": createdarticle.updatetime,
+                        "createdtime": createdarticle.createdtime
+                    }
+                    returnArticledata = {"code": "200", "msg": "Success！", "data": Articledata}
+                    return HttpResponse(json.dumps(returnArticledata))
+            except:
+                createarticle_createdDataerror = {"code": "-10", "msg": "ERROR！", "data": {}}
+                return HttpResponse(json.dumps(createarticle_createdDataerror))
+        else:
+            createarticle_tokenInvalid = {"code": "-11", "msg": "token过期", "data": {}}
+            return HttpResponse(json.dumps(createarticle_tokenInvalid))
+    else:
+        articledetails_requesterror = {"code": "-12", "msg": "请求方式错误！", "data": {}}
+        return HttpResponse(json.dumps(articledetails_requesterror))
+
+
+# 编辑文章接口
+def editarticle(request):
+    if request.POST:
+        if token(request.POST['token']):
+            try:
+                if request.POST['articletitle'] == "" or request.POST['articlecontent'] == "":
+                    editarticle_titleContentnull = {"code": "215", "msg": "文章标题或文章内容不能为空！", "data": {}}
+                    return HttpResponse(json.dumps(editarticle_titleContentnull))
+                else:
+                    editArticledata = models.article.objects.get(articleid=request.POST['articleid'],
+                                                                 authorid=request.POST['authorid'])
+                    authorinfo = models.user.objects.get(id=editArticledata.authorid)
+                    editArticledata.articletitle = request.POST['articletitle']
+                    editArticledata.articlecontent = request.POST['articlecontent']
+                    editArticledata.updatetime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+                    editArticledata.save()
+                    Articledata = {
+                        "articleid": editArticledata.articleid,
+                        "articletitle": editArticledata.articletitle,
+                        "articlecontent": editArticledata.articlecontent,
+                        "authorid": editArticledata.authorid,
+                        "author": authorinfo.nickname,
+                        "classifyid": editArticledata.classifyid,
+                        "coverpicture": editArticledata.coverpicture,
+                        "updatetime": editArticledata.updatetime,
+                        "createdtime": editArticledata.createdtime
+                    }
+                    editarticle_data = {"code": "200", "msg": "Success！", "data": Articledata}
+                    return HttpResponse(json.dumps(editarticle_data))
+            except:
+                editarticle_createdDataerror = {"code": "-10", "msg": "ERROR！", "data": {}}
+                return HttpResponse(json.dumps(editarticle_createdDataerror))
+
+        else:
+            editarticle_tokenInvalid = {"code": "-11", "msg": "token过期", "data": {}}
+            return HttpResponse(json.dumps(editarticle_tokenInvalid))
+
+    else:
+        articledetails_requesterror = {"code": "-12", "msg": "请求方式错误！", "data": {}}
+        return HttpResponse(json.dumps(articledetails_requesterror))
