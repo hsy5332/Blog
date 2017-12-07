@@ -83,6 +83,7 @@ DATABASES = {
 }
 '''
 #替换MySql 数据库
+'''
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -93,7 +94,17 @@ DATABASES = {
         'PORT': '3306',
     }
 }
-
+'''
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'test', #表名
+        'USER': 'huangshunyao',
+        'PASSWORD': "hsy5332!",
+        'HOST': "steel.iask.in",
+        'PORT': '33067',
+    }
+}
 
 
 
