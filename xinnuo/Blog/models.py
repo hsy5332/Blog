@@ -12,8 +12,8 @@ class article(models.Model):
     createdtime = models.DateTimeField(default='auto_now_add')
     updatetime = models.DateTimeField(default='auto_now')
 
-    #def  __str__(self):
-        #return self.articletitle #Python方法，调取函数，返回对象为articletitle，这样页面不会显示object
+    def  __str__(self):
+        return self.articletitle #Python方法，调取函数，返回对象为articletitle，这样页面不会显示object
 
 
 #article_classify 文章分类表
@@ -126,3 +126,6 @@ class link_configure(models.Model):
     number = models.CharField(max_length=4)
     createdtime = models.DateTimeField(default='auto_now_add')
     updatetime = models.DateTimeField(default='auto_now')
+
+
+

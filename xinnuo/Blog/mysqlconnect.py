@@ -1,16 +1,18 @@
 import MySQLdb
 
-db = MySQLdb.connect(
-    host = 'loaclhost',
-    port = 3306,
-    user = 'root',
-    password = '123',
-    db = 'test',
+def sqlconnect(sql):
+
+    db = MySQLdb.connect(
+        host = '192.168.26.62',
+        port = 3306,
+        user = 'root',
+        password = '123',
+        db = 'test',
 )
-cursor = db.cursor() #获取游标
-sql = "" #编写sql语句
+    cursor = db.cursor() #获取游标
+    cursor.execute(sql) #执行sql语句
+    data = cursor.fetchone() #获取数据
+    db.close() #关闭sql连接
+    return data
 
-cursor.execute(sql) #执行sql语句
-data = cursor.fetchone() #获取数据
-db.close() #关闭sql连接
-
+# 此方法慎用!!
