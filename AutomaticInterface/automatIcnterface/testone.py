@@ -9,7 +9,7 @@ dictlist = []
 dictdata = {}
 print (xy)
 s = '  -----abc123++++       '
-url = 'http://127.0.0.1:8000/Blog/search'
+#url = 'http://127.0.0.1:8000/Blog/search'
 z = 'keyword = 这是, token=1512353983'
 if " " in z:
     print("111111")
@@ -18,7 +18,7 @@ if " " in z:
     z = z.replace(',','=')
     print(z)
     z = z.split('=')
-    print(z)
+    print(z,'11111')
     m = z[::2]
     n = z[1::2]
     print(m)
@@ -27,8 +27,8 @@ if " " in z:
         print("123")
         dictdata = dict(zip(m,n))
         print(dictdata)
-        request = requests.post(url=url,data=dictdata)
-        print(request.text)
+        #request = requests.post(url=url,data=dictdata)
+        #print(request.text)
     else:
         print("22")
     #print(z.replace(' ','') )
