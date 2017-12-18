@@ -1,18 +1,37 @@
-import applicationperformance.launchTime
+#import applicationperformance.launchTime as launchTime #Mac系统
+import ApplicationPerformance.applicationperformance.launchTime as launchTime #windows 系统 引入applicationperformance.launchTime 模块重命名为launchTime
 import os
 import time
-
+import platform
 
 class CpuApplicationData(object):
+    #判断当前系统
+    def receiveSystomInfo(self):
+        return  platform.system()
+
+    #执行CPU百分比命令
     def receiveCpuDataCmd(self, packname, devicesid):
-        if devicesid != "":
-            receivecpucmd = "adb -s %s shell dumpsys cpuinfo | grep %s" % (devicesid, packname)
-            receivecpudata = os.popen(receivecpucmd)
-            return receivecpudata
+        if "Windows" in CpuApplicationData().receiveSystomInfo():
+            if devicesid != "":
+                receivecpucmd = "adb.exe -s %s shell dumpsys cpuinfo | find \"%s\"" % (devicesid, packname)
+                receivecpudata = os.popen(receivecpucmd)
+                return receivecpudata
+            else:
+                receivecpucmd = "adb.exe shell dumpsys cpuinfo | find %s" % (packname)
+                receivecpudata = os.popen(receivecpucmd)
+                return receivecpudata
+        elif "Linux" in CpuApplicationData().receiveSystomInfo():
+            if devicesid != "":
+                receivecpucmd = "adb -s %s shell dumpsys cpuinfo | grep %s" % (devicesid, packname)
+                receivecpudata = os.popen(receivecpucmd)
+                return receivecpudata
+            else:
+                receivecpucmd = "adb shell dumpsys cpuinfo | grep %s" % (packname)
+                receivecpudata = os.popen(receivecpucmd)
+                return receivecpudata
         else:
-            receivecpucmd = "adb shell dumpsys cpuinfo | grep %s" % (packname)
-            receivecpudata = os.popen(receivecpucmd)
-            return receivecpudata
+            print("当前系统环境有问题，无法识别当前系统属性。")
+
 
     # 执行monkey脚本
     def monkeyRun(self, monkeyscript):
@@ -21,7 +40,7 @@ class CpuApplicationData(object):
 
     # 获取CPU数据且保存数据
     def receiveCpuData(self):
-        caserows = applicationperformance.launchTime.ReadExcel().readeExcelData('cpudata')
+        caserows = launchTime.ReadExcel().readeExcelData('cpudata')
         for i in range(1, caserows.get('caserows')):
             casedata = caserows.get('excledata_sheel').row_values(i)
             caseid = int(casedata[0])
@@ -37,13 +56,20 @@ class CpuApplicationData(object):
                 if monkeyscript != "":
                     startruntime = time.time()
                     counts = 1
+                    two = 5
                     while count > 0:
                         CpuApplicationData().monkeyRun(monkeyscript)
                         startruntime = time.time()
-                        receivecpudata = CpuApplicationData().receiveCpuDataCmd(packname, devicesid)
-                        for cpudatas in receivecpudata:
-                            cpudatas = cpudatas.split("%")
-                            cpuproportion = cpudatas[0].strip() + "%"
+                        while two < 7 :
+                            receivecpudata = CpuApplicationData().receiveCpuDataCmd(packname, devicesid)
+                            for cpudatas in receivecpudata:
+                                cpudatas = cpudatas.split("%")
+                                cpuproportion = cpudatas[0].strip() + "%"
+                                cpuproportion = cpuproportion+","+cpuproportion#这里有问题每次获取都一样
+                                print(cpuproportion)
+                                time.sleep(intervaltime)
+                                break
+                            two += 1
                         endruntime = time.time()
                         runtime = int(str(endruntime - startruntime).split(".")[1][0:4])
                         runtimes = endruntime - startruntime
@@ -51,11 +77,12 @@ class CpuApplicationData(object):
                             cpuproportion, startruntime, endruntime, monkeyscript, functionscript,
                             time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
                             time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), caseid, runtimes)
-                        applicationperformance.launchTime.MysqlConnect().saveDatatoMysql("%s" % (savedata))
+                        launchTime.MysqlConnect().saveDatatoMysql("%s" % (savedata))
                         print("用例编号：%s,第%s次执行，执行时间为：%s ms。" % (caseid, counts, runtime))
                         time.sleep(intervaltime)
                         count -= 1
                         counts += 1
+                        two = 5
                 elif functionscript != "":
                     # 执行自动化测试用例的脚本
                     startruntime = time.time()
@@ -77,6 +104,7 @@ class CpuApplicationData(object):
                         for cpudatas in receivecpudata:
                             cpudatas = cpudatas.split("%")
                             cpuproportion = cpudatas[0].strip() + "%"
+                            break
                         endruntime = time.time()
                         runtime = int(str(endruntime - startruntime).split(".")[1][0:4])
                         runtimes = endruntime - startruntime
@@ -84,7 +112,7 @@ class CpuApplicationData(object):
                             cpuproportion, startruntime, endruntime, monkeyscript, functionscript,
                             time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
                             time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), caseid, runtimes)
-                        applicationperformance.launchTime.MysqlConnect().saveDatatoMysql("%s" % (savedata))
+                        launchTime.MysqlConnect().saveDatatoMysql("%s" % (savedata))
                         print("用例编号：%s,第%s次执行，执行时间为：%s ms。" % (caseid,counts, runtime))
                         time.sleep(intervaltime)
                         count -= 1
@@ -95,3 +123,4 @@ class CpuApplicationData(object):
 
 if __name__ == "__main__":
     CpuApplicationData().receiveCpuData()
+    #print(CpuApplicationData().receiveSystomInfo())
