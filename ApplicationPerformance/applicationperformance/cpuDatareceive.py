@@ -1,5 +1,5 @@
-import applicationperformance.launchTime as launchTime  # Mac系统
-# import ApplicationPerformance.applicationperformance.launchTime as launchTime #windows 系统 引入applicationperformance.launchTime 模块重命名为launchTime
+#import applicationperformance.launchTime as launchTime  # Mac系统
+import ApplicationPerformance.applicationperformance.launchTime as launchTime #windows 系统 引入applicationperformance.launchTime 模块重命名为launchTime
 import os
 import time
 import platform
@@ -21,17 +21,21 @@ class CpuApplicationData(object):
                 receivecpudata = os.popen(receivecpucmd)
                 for i in receivecpudata:
                     cpudatas.append(i)
+                while "\n" in cpudatas:
+                    cpudatas.remove("\n")
                 for cpuproportiondatas in cpudatas:
                     cpuproportiondata = float(cpuproportiondatas.split('%')[0])
                     cpuproportion = cpuproportion + cpuproportiondata
                 return str(cpuproportion) + '%'
             else:
-                receivecpucmd = "adb.exe shell dumpsys cpuinfo | find %s" % (searchkey)
+                receivecpucmd = "adb.exe shell dumpsys cpuinfo | find \"%s\"" % (searchkey)
                 cpudatas = []
                 cpuproportion = 0
                 receivecpudata = os.popen(receivecpucmd)
                 for i in receivecpudata:
                     cpudatas.append(i)
+                while "\n" in cpudatas:
+                    cpudatas.remove("\n")
                 for cpuproportiondatas in cpudatas:
                     cpuproportiondata = float(cpuproportiondatas.split('%')[0])
                     cpuproportion = cpuproportion + cpuproportiondata
@@ -69,14 +73,41 @@ class CpuApplicationData(object):
 
     # 停止运行monkey
     def Stopmonkey(self, devicesid):
-        if devicesid != "":
-            for i in os.popen("adb -s %s shell ps | grep monkey" % (devicesid)):
-                stopmonkeycmd = i.split()[1]
+        if "Windows" in CpuApplicationData().receiveSystomInfo():  # Windows系统
+            if devicesid != "":
+                executecmd = []
+                for i in os.popen("adb -s %s shell ps | find \"monkey\"" % (devicesid)):
+                    executecmd.append(i)
+                while "\n" in executecmd:
+                    executecmd.remove("\n")
+                stopmonkeycmd = executecmd[0].split()[1]
                 os.popen("adb -s %s shell kill -9 %s" % (devicesid, stopmonkeycmd))
-        else:
-            for i in os.popen("adb shell ps | grep monkey"):
-                stopmonkeycmd = i.split()[1]
+            else:
+                executecmd = []
+                for i in os.popen("adb shell ps | find \"monkey\""):
+                    executecmd.append(i)
+                while "\n" in executecmd:
+                    executecmd.remove("\n")
+                stopmonkeycmd = executecmd[0].split()[1]
                 os.popen("adb shell kill -9 %s" % (stopmonkeycmd))
+        elif "Darwin" in CpuApplicationData().receiveSystomInfo():  # Mac系统
+            if devicesid != "":
+                for i in os.popen("adb -s %s shell ps | grep monkey" % (devicesid)):
+                    stopmonkeycmd = i.split()[1]
+                    os.popen("adb -s %s shell kill -9 %s" % (devicesid, stopmonkeycmd))
+            else:
+                for i in os.popen("adb shell ps | grep monkey"):
+                    stopmonkeycmd = i.split()[1]
+                    os.popen("adb shell kill -9 %s" % (stopmonkeycmd))
+        else:
+            if devicesid != "":
+                for i in os.popen("adb -s %s shell ps | grep monkey" % (devicesid)):
+                    stopmonkeycmd = i.split()[1]
+                    os.popen("adb -s %s shell kill -9 %s" % (devicesid, stopmonkeycmd))
+            else:
+                for i in os.popen("adb shell ps | grep monkey"):
+                    stopmonkeycmd = i.split()[1]
+                    os.popen("adb shell kill -9 %s" % (stopmonkeycmd))
 
     # 获取CPU数据且保存数据
     def receiveCpuData(self):
@@ -103,7 +134,7 @@ class CpuApplicationData(object):
                     if monkeyscript != "":
                         runnumber = 1
                         CpuApplicationData().monkeyRun(monkeyscript)  # 运行monkey脚本
-                        cpuproportions = ""  # 统计执行monkey时，获取的CPU值。
+                        cpuproportions = ""  # 统计执行monkey时，获取CPU值。
                         while count > 0:
                             startruntime = time.time()
                             cpuproportion = CpuApplicationData().receiveCpuDataCmd(searchkey, devicesid)
