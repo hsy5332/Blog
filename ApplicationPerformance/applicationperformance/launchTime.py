@@ -144,22 +144,22 @@ class MysqlConnect(object):
         return data
 
     def saveDatatoMysql(self, sql):  # 保存数据
-        # connect = pymysql.connect(
-        #     host='192.168.1.9',  # 测试环境
-        #     port=33006,
-        #     user='huangshunyao',
-        #     passwd='Hsy5332#',  # 注意password
-        #     db='automation_db',
-        #     charset='utf8',  # 解决中文乱码
-        # )
         connect = pymysql.connect(
-            host='steel.iask.in',
-            port=33067,
+            host='192.168.1.9',  # 测试环境
+            port=33006,
             user='huangshunyao',
-            password='Hsy5332#',
+            passwd='Hsy5332#',  # 注意password
             db='automation_db',
             charset='utf8',  # 解决中文乱码
         )
+        # connect = pymysql.connect(
+        #     host='steel.iask.in',
+        #     port=33067,
+        #     user='huangshunyao',
+        #     password='Hsy5332#',
+        #     db='automation_db',
+        #     charset='utf8',  # 解决中文乱码
+        # )
         cursor = connect.cursor()  # 获取游标
         cursor.execute(sql)  # 执行sql语句
         connect.commit()  # 提交数据
@@ -176,13 +176,13 @@ class ReadExcel(object):
             returndata = {'caserows': caserows, 'excledata_sheel': excledata_sheel}
             return returndata
         elif launchtime == 'cpudata':
-            excelcase = xlrd.open_workbook("one.xlsx")
+            excelcase = xlrd.open_workbook("Testcase.xlsx")
             excledata_sheel = excelcase.sheet_by_name('cpudata')
             caserows = excledata_sheel.nrows
             returndata = {'caserows': caserows, 'excledata_sheel': excledata_sheel}
             return returndata
         elif launchtime == 'memorydata':
-            excelcase = xlrd.open_workbook("one.xlsx")
+            excelcase = xlrd.open_workbook("Testcase.xlsx")
             excledata_sheel = excelcase.sheet_by_name('memorydata')
             caserows = excledata_sheel.nrows
             returndata = {'caserows': caserows, 'excledata_sheel': excledata_sheel}

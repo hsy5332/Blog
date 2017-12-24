@@ -1,13 +1,38 @@
 import os
 import time
-import applicationperformance.cpuDatareceive as cpuDatareceive #Mac系统 导入模块重命名
-import applicationperformance.launchTime as launchTime
+#import applicationperformance.cpuDatareceive as cpuDatareceive #Mac系统 导入模块重命名
+#import applicationperformance.launchTime as launchTime
+import ApplicationPerformance.applicationperformance.cpuDatareceive as cpuDatareceive #Windows系统 导入模块重命名
+import ApplicationPerformance.applicationperformance.launchTime as launchTime
 class MemoryApplicationData(object):
 
     #获取内存的数据
     def receiveMemoryCmd(self,searchkey,devicesid):
         if "Windows" in cpuDatareceive.CpuApplicationData().receiveSystomInfo() :
-            pass
+            if devicesid != "":  # 有devicesid
+                executememorycmd = os.popen("adb -s %s shell dumpsys meminfo | find \"%s\"" % (devicesid, searchkey))
+                memoryinfo = []
+                memorycounts = 0
+                for x in executememorycmd:
+                    memoryinfo.append(x.strip())
+                memoryinfo = memoryinfo[0:3]
+                while "" in memoryinfo:
+                    memoryinfo.remove("")
+                for memorycount in memoryinfo:
+                    memorycounts = memorycounts + (int(memorycount.split('kB')[0].strip()))
+                return str(memorycounts / 1024) + 'MB'
+            else:
+                executememorycmd = os.popen("adb shell dumpsys meminfo | find \"%s\""  % (searchkey))
+                memoryinfo = []
+                memorycounts = 0
+                for x in executememorycmd:
+                    memoryinfo.append(x.strip())
+                memoryinfo = memoryinfo[0:3]
+                while "" in memoryinfo:
+                    memoryinfo.remove("")
+                for memorycount in memoryinfo:
+                    memorycounts = memorycounts + (int(memorycount.split('kB')[0].strip()))
+                return str(memorycounts / 1024) + 'MB'
         elif "Darwin" in cpuDatareceive.CpuApplicationData().receiveSystomInfo():
             if devicesid != "":  # 有devicesid
                 executememorycmd = os.popen("adb -s %s shell dumpsys meminfo | grep %s" % (devicesid, searchkey))
@@ -56,7 +81,7 @@ class MemoryApplicationData(object):
                     if monkeyscript != "":
                         runnumber = 1
                         cpuDatareceive.CpuApplicationData().monkeyRun(monkeyscript)  # 运行monkey脚本
-                        memorydatas = ""  # 统计执行monkey时，获取的CPU值。
+                        memorydatas = ""  # 统计执行monkey时，获取内存值。
                         while count > 0:
                             startruntime = time.time()
                             memorydata = MemoryApplicationData().receiveMemoryCmd(searchkey, devicesid)
@@ -75,7 +100,7 @@ class MemoryApplicationData(object):
                             time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
                             time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), caseid, runtimes, eventid)
                         launchTime.MysqlConnect().saveDatatoMysql("%s" % (savedata))
-                        cpuDatareceive.CpuApplicationData().monkeyRun(monkeyscript)  # 停止monkey脚本
+                        cpuDatareceive.CpuApplicationData().Stopmonkey(devicesid)  # 停止monkey脚本
                     elif functionscript != "":
                         # 执行自动化测试用例的脚本
                         startruntime = time.time()
