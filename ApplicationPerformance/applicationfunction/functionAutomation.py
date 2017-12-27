@@ -24,7 +24,7 @@ class FunctionAutomation(object):
         pass
 
     # 点击事件
-    def operateClick(self, operatetype, element, driver, caseid):
+    def operateClick(self, operatetype, element, driver, caseid,*parameter):
 
         if operatetype == "点击_id":
             try:
@@ -35,6 +35,12 @@ class FunctionAutomation(object):
         elif operatetype == "点击_xpath":
             try:
                 driver.find_element_by_xpath(element).click()  # 点击xpath
+                print("用例编号:%s,执行通过。" % (caseid))
+            except:
+                print("用例编号:%s,执行不通过。" % (caseid))
+        elif operatetype == "点击_classid":
+            try:
+                driver.find_elements_by_class_name(element)[parameter[0]].click()  # 点击xpath
                 print("用例编号:%s,执行通过。" % (caseid))
             except:
                 print("用例编号:%s,执行不通过。" % (caseid))
@@ -86,8 +92,9 @@ class FunctionAutomation(object):
                             elif operatetype == "点击_xpath":  # 根据xpath点击
                                 FunctionAutomation().operateClick(operatetype, element, driver, caseid)
                                 time.sleep(waittime)
-                            elif operatetype == "test":
-                                pass
+                            elif operatetype == "点击_classid":
+                                FunctionAutomation().operateClick(operatetype, element, driver, caseid,int(parameter))
+                                time.sleep(waittime)
                             else:
                                 print("用例编号:%s操作类型错误,该用例不执行。" % (caseid))
                         else:
