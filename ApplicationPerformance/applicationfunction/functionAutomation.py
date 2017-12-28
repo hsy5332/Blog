@@ -1,6 +1,7 @@
 import applicationperformance.launchTime as launchTime
 from appium import webdriver
 import time
+from appium.webdriver.common.touch_action import TouchAction
 
 
 class FunctionAutomation(object):
@@ -24,7 +25,7 @@ class FunctionAutomation(object):
         pass
 
     # 点击事件
-    def operateClick(self, operatetype, element, driver, caseid,*parameter):
+    def operateClick(self, operatetype, element, driver, caseid, *parameter):
 
         if operatetype == "点击_id":
             try:
@@ -44,13 +45,68 @@ class FunctionAutomation(object):
                 print("用例编号:%s,执行通过。" % (caseid))
             except:
                 print("用例编号:%s,执行不通过。" % (caseid))
+        else:
+            print("用例编号:%s,执行不通过，该用例的元素属性或参数可能有问题，请检查该用例。" % (caseid))
 
     # 滑动操作
-    def operateslide(self, direction):
-        pass
+    def operateslide(self, operatetype, driver, caseid):
+        x = driver.get_window_size()['width']
+        y = driver.get_window_size()['height']
+        if operatetype == "向上滑动":
+            try:
+                driver.swipe(x * 0.5, y * 0.9, x * 0.5, y * 0.3)
+                print("用例编号:%s,执行通过。" % (caseid))
+            except:
+                print("用例编号:%s,执行不通过。" % (caseid))
+        elif operatetype == "向左滑动":
+            try:
+                driver.swipe(x * 0.9, y * 0.5, x * 0.08, y * 0.5)
+                print("用例编号:%s,执行通过。" % (caseid))
+            except:
+                print("用例编号:%s,执行不通过。" % (caseid))
+        elif operatetype == "向下滑动":
+            try:
+                driver.swipe(x * 0.5, y * 0.3, x * 0.5, y * 0.9)
+                print("用例编号:%s,执行通过。" % (caseid))
+            except:
+                print("用例编号:%s,执行不通过。" % (caseid))
+        elif operatetype == "向右滑动":
+            try:
+                driver.swipe(x * 0.08, y * 0.5, x * 0.9, y * 0.5)
+                print("用例编号:%s,执行通过。" % (caseid))
+            except:
+                print("用例编号:%s,执行不通过。" % (caseid))
+        else:
+            print("用例编号:%s,执行不通过，该用例的元素属性或参数可能有问题，请检查该用例。" % (caseid))
 
     # 长按操作
-    def operateLongClick(self):
+    def operateLongClick(self, operatetype, element, driver, caseid,*parameter):
+        if operatetype == "长按_id":
+            try:
+                el = driver.find_element_by_id(element)
+                TouchAction(driver).long_press(el, 1).release().perform()
+                print("用例编号:%s,执行通过。" % (caseid))
+            except:
+                print("用例编号:%s,执行不通过。" % (caseid))
+        elif operatetype == "长按_classid":
+            try:
+                el = driver.find_elements_by_class_name[element][parameter[0]]
+                TouchAction(driver).long_press(el, 1).release().perform()
+                print("用例编号:%s,执行通过。" % (caseid))
+            except:
+                print("用例编号:%s,执行不通过。" % (caseid))
+        elif operatetype == "长按_xpath":
+            try:
+                el = driver.find_element_by_xpath(element)
+                TouchAction(driver).long_press(el,1).release().perform()
+                print("用例编号:%s,执行通过。" % (caseid))
+            except:
+                print("用例编号:%s,执行不通过。" % (caseid))
+        else:
+            print("用例编号:%s,执行不通过，该用例的元素属性或参数可能有问题，请检查该用例。" % (caseid))
+
+    #输入操作
+    def operateInput(self):
         pass
 
     # 运行用例
@@ -93,7 +149,28 @@ class FunctionAutomation(object):
                                 FunctionAutomation().operateClick(operatetype, element, driver, caseid)
                                 time.sleep(waittime)
                             elif operatetype == "点击_classid":
-                                FunctionAutomation().operateClick(operatetype, element, driver, caseid,int(parameter))
+                                FunctionAutomation().operateClick(operatetype, element, driver, caseid, int(parameter))
+                                time.sleep(waittime)
+                            elif operatetype == "向上滑动":
+                                FunctionAutomation().operateslide(operatetype, driver, caseid)
+                                time.sleep(waittime)
+                            elif operatetype == "向左滑动":
+                                FunctionAutomation().operateslide(operatetype, driver, caseid)
+                                time.sleep(waittime)
+                            elif operatetype == "向下滑动":
+                                FunctionAutomation().operateslide(operatetype, driver, caseid)
+                                time.sleep(waittime)
+                            elif operatetype == "向右滑动":
+                                FunctionAutomation().operateslide(operatetype, driver, caseid)
+                                time.sleep(waittime)
+                            elif operatetype == "长按_id":
+                                FunctionAutomation().operateLongClick(operatetype,element,driver,caseid)
+                                time.sleep(waittime)
+                            elif operatetype == "长按_xpath":
+                                FunctionAutomation().operateLongClick(operatetype, element, driver, caseid)
+                                time.sleep(waittime)
+                            elif operatetype == "长按_classid":
+                                FunctionAutomation().operateLongClick(operatetype, element, driver, caseid, int(parameter))
                                 time.sleep(waittime)
                             else:
                                 print("用例编号:%s操作类型错误,该用例不执行。" % (caseid))
