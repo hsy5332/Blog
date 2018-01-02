@@ -1,9 +1,10 @@
 import os
 import time
-#import applicationperformance.cpuDatareceive as cpuDatareceive #Mac系统 导入模块重命名
-#import applicationperformance.launchTime as launchTime
-import ApplicationPerformance.applicationperformance.cpuDatareceive as cpuDatareceive #Windows系统 导入模块重命名
-import ApplicationPerformance.applicationperformance.launchTime as launchTime
+import applicationperformance.cpuDatareceive as cpuDatareceive #Mac系统 导入模块重命名
+import applicationperformance.launchTime as launchTime
+import applicationfunction.functionAutomation as functionAutomation
+#import ApplicationPerformance.applicationperformance.cpuDatareceive as cpuDatareceive #Windows系统 导入模块重命名
+#import ApplicationPerformance.applicationperformance.launchTime as launchTime
 class MemoryApplicationData(object):
 
     #获取内存的数据
@@ -102,20 +103,27 @@ class MemoryApplicationData(object):
                         launchTime.MysqlConnect().saveDatatoMysql("%s" % (savedata))
                         cpuDatareceive.CpuApplicationData().Stopmonkey(devicesid)  # 停止monkey脚本
                     elif functionscript != "":
-                        # 执行自动化测试用例的脚本
-                        startruntime = time.time()
+                        # 执行自动化功能测试用例的脚本
+                        functionAutomation.FunctionAutomation().runTestCase("open")#执行自动化测试用例
+                        runnumber = 1
                         while count > 0:
-                            receivecpudata = cpuDatareceive.CpuApplicationData().receiveCpuDataCmd(searchkey, devicesid)
-                            for cpudatas in receivecpudata:
-                                cpudatas = cpudatas.split("%")
-                                cpudata = cpudatas[0].strip() + "%"
-                                print(cpudata)
+                            startruntime = time.time()
+                            memorydata = MemoryApplicationData().receiveMemoryCmd(searchkey, devicesid)
+                            endruntime = time.time()
+                            runtime = int(str(endruntime - startruntime).split(".")[1][0:4])
+                            runtimes = endruntime - startruntime
+                            savedata = "insert into automation_mem_app  (`memorysize`,`starttime`,`endtime`,`monkeyscript`,`functionscript`,`createdtime`,`updatetime`,`caseid`,`runtime`,`eventid`)VALUES('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')" % (
+                                memorydata, startruntime, endruntime, monkeyscript, functionscript,
+                                time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
+                                time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), caseid, runtimes, eventid)
+                            launchTime.MysqlConnect().saveDatatoMysql("%s" % (savedata))
+                            print("用例编号：%s,第%s次执行，执行时间为：%s ms,执行结果为：%s" % (caseid, runnumber, runtime, memorydata))
                             time.sleep(intervaltime)
                             count -= 1
-                        print("我是functionstatus")
-                        endruntime = time.time()
+                            runnumber += 1
                     else:
                         launchTime.LaunchApplication().coolLaunch(packactivity, devicesid)
+                        time.sleep(8)#等待APP启动
                         runnumber = 1
                         while count > 0:
                             startruntime = time.time()
@@ -135,7 +143,7 @@ class MemoryApplicationData(object):
                 else:
                     print("用例编号:%s，该用例执行次数为0，则不执行，用例数据为：%s" % (caseid, returndata))
             elif 'N' in executestatus:
-                print("用例编号:%s，该用例执行状态为NO，则不执行，用例数据为：%s" % (caseid, returndata))
+                print("用例编号:%s，该用例执行状态为No，则不执行，用例数据为：%s" % (caseid, returndata))
             else:
                 print("用例编号:%s，该用例未执行，请检查该用例状态是否为Yes或No.用例数据为：%s" % (caseid, returndata))
 

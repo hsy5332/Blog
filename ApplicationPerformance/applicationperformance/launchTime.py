@@ -95,7 +95,7 @@ class LaunchApplication(object):
                                 if "ThisTime" in launchtimes:
                                     launchtime = launchtimes.split(':')[1].strip() + 'ms'
                                     endtime = time.time()
-                                    print(launchtime)
+                                    print("第%s次启动时间为：" % (launchcount), launchtime)
                                     time.sleep(5)
                                     LaunchApplication().stopApp(packname, devicesid)  # 关闭APP
                                     savedata = "insert into automation_Launch_app  (`starttime`,`launchtime`,`endtime`,`launchtype`,`createdtime`,`updatetime`,`caseid`,`eventid`)VALUES('%s','%s','%s','%s','%s','%s','%s','%s')" % (
@@ -144,22 +144,22 @@ class MysqlConnect(object):
         return data
 
     def saveDatatoMysql(self, sql):  # 保存数据
-        connect = pymysql.connect(
-            host='192.168.1.9',  # 测试环境
-            port=33006,
-            user='huangshunyao',
-            passwd='Hsy5332#',  # 注意password
-            db='automation_db',
-            charset='utf8',  # 解决中文乱码
-        )
         # connect = pymysql.connect(
-        #     host='steel.iask.in',
-        #     port=33067,
+        #     host='192.168.1.9',  # 测试环境
+        #     port=33006,
         #     user='huangshunyao',
-        #     password='Hsy5332#',
+        #     passwd='Hsy5332#',  # 注意password
         #     db='automation_db',
         #     charset='utf8',  # 解决中文乱码
         # )
+        connect = pymysql.connect(
+            host='steel.iask.in',
+            port=33067,
+            user='huangshunyao',
+            password='Hsy5332#',
+            db='automation_db',
+            charset='utf8',  # 解决中文乱码
+        )
         cursor = connect.cursor()  # 获取游标
         cursor.execute(sql)  # 执行sql语句
         connect.commit()  # 提交数据
@@ -184,6 +184,19 @@ class ReadExcel(object):
         elif launchtime == 'memorydata':
             excelcase = xlrd.open_workbook("Testcase.xlsx")
             excledata_sheel = excelcase.sheet_by_name('memorydata')
+            caserows = excledata_sheel.nrows
+            returndata = {'caserows': caserows, 'excledata_sheel': excledata_sheel}
+            return returndata
+        elif launchtime == 'deviceinfo':
+            excelcase = xlrd.open_workbook("/Volumes/Software/Work/Eclipse/PycharmProjects/ApplicationPerformance/applicationfunction/Testfuncase.xlsx")
+            excledata_sheel = excelcase.sheet_by_name('deviceinfo')
+            caserows = excledata_sheel.nrows
+            returndata = {'caserows': caserows, 'excledata_sheel': excledata_sheel}
+            return returndata
+
+        elif launchtime == 'funcase':
+            excelcase = xlrd.open_workbook("/Volumes/Software/Work/Eclipse/PycharmProjects/ApplicationPerformance/applicationfunction/Testfuncase.xlsx")
+            excledata_sheel = excelcase.sheet_by_name('funcase')
             caserows = excledata_sheel.nrows
             returndata = {'caserows': caserows, 'excledata_sheel': excledata_sheel}
             return returndata

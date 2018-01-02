@@ -1,5 +1,6 @@
-#import applicationperformance.launchTime as launchTime  # Mac系统
-import ApplicationPerformance.applicationperformance.launchTime as launchTime #windows 系统 引入applicationperformance.launchTime 模块重命名为launchTime
+import applicationperformance.launchTime as launchTime  # Mac系统
+#import ApplicationPerformance.applicationperformance.launchTime as launchTime #windows 系统 引入applicationperformance.launchTime 模块重命名为launchTime
+import applicationfunction.functionAutomation as functionAutomation
 import os
 import time
 import platform
@@ -16,11 +17,9 @@ class CpuApplicationData(object):
         if "Windows" in CpuApplicationData().receiveSystomInfo():  # Windows系统
             if devicesid != "":
                 receivecpucmd = "adb.exe -s %s shell dumpsys cpuinfo | find \"%s\"" % (devicesid, searchkey)
-                cpudatas = []
                 cpuproportion = 0
                 receivecpudata = os.popen(receivecpucmd)
-                for i in receivecpudata:
-                    cpudatas.append(i)
+                cpudatas = [i for i in receivecpudata]
                 while "\n" in cpudatas:
                     cpudatas.remove("\n")
                 for cpuproportiondatas in cpudatas:
@@ -29,11 +28,9 @@ class CpuApplicationData(object):
                 return str(cpuproportion) + '%'
             else:
                 receivecpucmd = "adb.exe shell dumpsys cpuinfo | find \"%s\"" % (searchkey)
-                cpudatas = []
                 cpuproportion = 0
                 receivecpudata = os.popen(receivecpucmd)
-                for i in receivecpudata:
-                    cpudatas.append(i)
+                cpudatas = [i for i in receivecpudata]
                 while "\n" in cpudatas:
                     cpudatas.remove("\n")
                 for cpuproportiondatas in cpudatas:
@@ -43,11 +40,9 @@ class CpuApplicationData(object):
         elif "Darwin" in CpuApplicationData().receiveSystomInfo():  # Mac系统
             if devicesid != "":
                 receivecpucmd = "adb -s %s shell dumpsys cpuinfo | grep %s" % (devicesid, searchkey)
-                cpudatas = []
                 cpuproportion = 0
                 receivecpudata = os.popen(receivecpucmd)
-                for i in receivecpudata:
-                    cpudatas.append(i)
+                cpudatas = [i for i in receivecpudata]
                 for cpuproportiondatas in cpudatas:
                     cpuproportiondata = float(cpuproportiondatas.split('%')[0])
                     cpuproportion = cpuproportion + cpuproportiondata
@@ -55,11 +50,9 @@ class CpuApplicationData(object):
 
             else:
                 receivecpucmd = "adb shell dumpsys cpuinfo | grep %s" % (searchkey)
-                cpudatas = []
                 cpuproportion = 0
                 receivecpudata = os.popen(receivecpucmd)
-                for i in receivecpudata:
-                    cpudatas.append(i)
+                cpudatas = [i for i in receivecpudata]
                 for cpuproportiondatas in cpudatas:
                     cpuproportiondata = float(cpuproportiondatas.split('%')[0])
                     cpuproportion = cpuproportion + cpuproportiondata
@@ -75,17 +68,13 @@ class CpuApplicationData(object):
     def Stopmonkey(self, devicesid):
         if "Windows" in CpuApplicationData().receiveSystomInfo():  # Windows系统
             if devicesid != "":
-                executecmd = []
-                for i in os.popen("adb -s %s shell ps | find \"monkey\"" % (devicesid)):
-                    executecmd.append(i)
+                executecmd = [i for i in os.popen("adb -s %s shell ps | find \"monkey\"" % (devicesid))]
                 while "\n" in executecmd:
                     executecmd.remove("\n")
                 stopmonkeycmd = executecmd[0].split()[1]
                 os.popen("adb -s %s shell kill -9 %s" % (devicesid, stopmonkeycmd))
             else:
-                executecmd = []
-                for i in os.popen("adb shell ps | find \"monkey\""):
-                    executecmd.append(i)
+                executecmd = [i for i in os.popen("adb shell ps | find \"monkey\"")]
                 while "\n" in executecmd:
                     executecmd.remove("\n")
                 stopmonkeycmd = executecmd[0].split()[1]
@@ -155,18 +144,23 @@ class CpuApplicationData(object):
                         launchTime.MysqlConnect().saveDatatoMysql("%s" % (savedata))
                         CpuApplicationData().Stopmonkey(devicesid)  # 停止monkey脚本
                     elif functionscript != "":
-                        # 执行自动化测试用例的脚本
-                        startruntime = time.time()
+                        functionAutomation.FunctionAutomation().runTestCase("open")  # 执行自动化测试用例
+                        runnumber = 1
                         while count > 0:
-                            receivecpudata = CpuApplicationData().receiveCpuDataCmd(searchkey, devicesid)
-                            for cpudatas in receivecpudata:
-                                cpudatas = cpudatas.split("%")
-                                cpudata = cpudatas[0].strip() + "%"
-                                print(cpudata)
+                            startruntime = time.time()
+                            cpuproportion = CpuApplicationData().receiveCpuDataCmd(searchkey, devicesid)
+                            endruntime = time.time()
+                            runtime = int(str(endruntime - startruntime).split(".")[1][0:4])
+                            runtimes = endruntime - startruntime
+                            savedata = "insert into automation_cpu_app  (`cpuproportion`,`starttime`,`endtime`,`monkeyscript`,`functionscript`,`createdtime`,`updatetime`,`caseid`,`runtime`,`eventid`)VALUES('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')" % (
+                                cpuproportion, startruntime, endruntime, monkeyscript, functionscript,
+                                time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
+                                time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), caseid, runtimes, eventid)
+                            launchTime.MysqlConnect().saveDatatoMysql("%s" % (savedata))
+                            print("用例编号：%s,第%s次执行，执行时间为：%s ms,执行结果为：%s" % (caseid, runnumber, runtime, cpuproportion))
                             time.sleep(intervaltime)
                             count -= 1
-                        print("我是functionstatus")
-                        endruntime = time.time()
+                            runnumber += 1
                     else:
                         launchTime.LaunchApplication().coolLaunch(packactivity, devicesid)
                         runnumber = 1
