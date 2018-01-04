@@ -39,14 +39,20 @@ class WebAutomation(object):
 
         elif operatetype == "点击_textname":  # 点击textname
             try:
-                driver.find_elements_by_name(element)[0].click()#这里有问题
+                driver.find_elements_by_name(element)[0].click()  # 这里有问题
                 print("用例编号:%s,执行通过。" % (caseid))
             except:
                 print("用例编号:%s,执行不通过。" % (caseid))
 
-        elif operatetype == "点击_classid":
+        elif operatetype == "点击_classname":
             try:
                 driver.find_elements_by_class_name(element)[0].click()  # 点击xpath
+                print("用例编号:%s,执行通过。" % (caseid))
+            except:
+                print("用例编号:%s,执行不通过。" % (caseid))
+        elif operatetype == "点击_linkname":
+            try:
+                driver.find_elements_by_link_text(element)[0].click()
                 print("用例编号:%s,执行通过。" % (caseid))
             except:
                 print("用例编号:%s,执行不通过。" % (caseid))
@@ -100,8 +106,13 @@ class WebAutomation(object):
                             WebAutomation().operateClick(operatetype, element, driver, caseid)
                             time.sleep(waittime)
                         elif operatetype == "点击_textname":
-                            driver.find_element_by_id("kw").send_keys("123")
-                            driver.find_element_by_id("kw").send_keys("事实上")
+                            # driver.find_element_by_id("kw").send_keys("事实上")
+                            WebAutomation().operateClick(operatetype, element, driver, caseid)
+                            time.sleep(waittime)
+                        elif operatetype == "点击_linkname":
+                            WebAutomation().operateClick(operatetype, element, driver, caseid)
+                            time.sleep(waittime)
+                        elif operatetype == "点击_classname":
                             WebAutomation().operateClick(operatetype, element, driver, caseid)
                             time.sleep(waittime)
                         else:
