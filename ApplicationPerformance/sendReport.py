@@ -5,56 +5,68 @@ from urllib.request import urlopen  # quote,urlopen发送短信的接口使用
 from email.mime.text import MIMEText
 from email.header import Header
 
-def senderEmail():
-    # 第三方 SMTP 服务
-    mail_host = "smtp.163.com"  # 设置服务器
-    mail_user = "allencredit@163.com"  # 用户名
-    mail_pass = "xiaoxi5332"  # 口令
+class SendReport(object):
 
-    sender = 'allencredit@163.com'
-    receivers = ['459941505@qq.com']  # 接收邮件，可设置为你的QQ邮箱或者其他邮箱
+    #发邮件提醒
+    def senderEmail(self, toemail, ccemail, runtime, count):
+        sendmail_configure = {
+            'mail_host': 'smtp.163.com',  # 设置服务器
+            'mail_user': "allencredit@163.com",  # 用户名
+            'mail_pass': 'xiaoxi5332',  # 邮箱密码
+        }
+        sender = 'allencredit@163.com'
+        if toemail == "" or "@" not in toemail :
+            toemail = "allenyao@qq.com"
+        if ccemail == "" or "@" not in ccemail:
+            ccemail = ""
+        receivers = toemail.split(',') + ccemail.split(',')  # 收件人+抄送人
+        message = MIMEText("Dear all: \n           测试用例全部执行完毕，执行用例时间为：%s，共执行%s个用例，通过X用例。" % (runtime, count), 'plain',
+                           'utf-8')
+        message['From'] = Header("automationauthor", 'utf-8')  # 收件人
+        message['To'] = Header(toemail)  # 收件人的地址栏显示
+        message['Cc'] = ccemail
+        subject = '自动化测试用例结果'  # 邮件标题
+        message['Subject'] = Header(subject, 'utf-8')
+        try:
+            smtpObj = smtplib.SMTP()
+            # 163 默认端口25 也为 SMTP 端口号 465/994
+            smtpObj.connect(sendmail_configure.get('mail_host'), 25)
+            smtpObj.login(sendmail_configure.get(
+                'mail_user'), sendmail_configure.get('mail_pass'))  # 邮箱的登录
+            smtpObj.sendmail(sender, receivers, message.as_string())
+            return ("邮件发送成功")
+        except smtplib.SMTPException:
+            return ("Error: 无法发送邮件")
+    #发短信提醒 短信的文案还未修改完善
+    def sendmessage(self):
+        appkey = "12fa16d0a55a8ef4925ac22825487343"
+        mobile = "17721292302"
+        tpl_id = "52062"
+        tpl_value ='#code#=%s&#company#=JuheData'%("ssss")
+        sendurl = 'http://v.juhe.cn/sms/send'  # 短信发送的URL,无需修改
 
-    message = MIMEText('Python 邮件发送测试...', 'plain', 'utf-8')
-    message['From'] = Header("菜鸟教程", 'utf-8')
-    message['To'] = Header("测试", 'utf-8')
+        params = 'key=%s&mobile=%s&tpl_id=%s&tpl_value=%s' % \
+                 (appkey, mobile, tpl_id, quote(tpl_value))  # 组合参数
 
-    subject = 'Python SMTP 邮件测试'
-    message['Subject'] = Header(subject, 'utf-8')
+        wp = urlopen(sendurl + "?" + params)
+        content = wp.read()  # 获取接口返回内容
 
-    smtpObj = smtplib.SMTP()
-    smtpObj.connect(mail_host, 25)  # 25 为 SMTP 端口号
-    smtpObj.login(mail_user, mail_pass)
-    smtpObj.sendmail(sender, receivers, message.as_string())
-    print("邮件发送成功")
+        result = json.loads(content)
 
-
-def sendmessage():
-    appkey = "12fa16d0a55a8ef4925ac22825487343"
-    mobile = "17721292302"
-    tpl_id = "52062"
-    tpl_value ='#code#=%s&#company#=JuheData'%("ssss")
-    sendurl = 'http://v.juhe.cn/sms/send'  # 短信发送的URL,无需修改
-
-    params = 'key=%s&mobile=%s&tpl_id=%s&tpl_value=%s' % \
-             (appkey, mobile, tpl_id, quote(tpl_value))  # 组合参数
-
-    wp = urlopen(sendurl + "?" + params)
-    content = wp.read()  # 获取接口返回内容
-
-    result = json.loads(content)
-
-    if result:
-        error_code = result['error_code']
-        if error_code == 0:
-            # 发送成功
-            smsid = result['result']['sid']
-            return ("sendsms success,smsid: %s" % (smsid))
+        if result:
+            error_code = result['error_code']
+            if error_code == 0:
+                # 发送成功
+                smsid = result['result']['sid']
+                return ("sendsms success,smsid: %s" % (smsid))
+            else:
+                # 发送失败
+                return ("sendsms error :(%s) %s" % (error_code, result['reason']))
         else:
-            # 发送失败
-            return ("sendsms error :(%s) %s" % (error_code, result['reason']))
-    else:
-        # 请求失败
-        return ("request sendsms error")
+            # 请求失败
+            return ("request sendsms error")
 
-senderEmail()
+if __name__ == "__main__":
+    SendReport().senderEmail("","","",""); #邮箱提醒
+    # SendReport().sendmessage();#手机短信提醒
 # print(sendmessage())
