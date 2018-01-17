@@ -430,7 +430,6 @@ class WebAutomation(object):
                 casedata = launchTime.ReadExcel().readeExcelData('browseefuncase')  # 读取自动化用例数据
                 x = 1
                 try:
-                    startonecasetime = time.time()
                     casecount = casedata.get('caserows')-1  # 用例总数
                     while x < casecount:
                         excelcasedata = casedata.get('excledata_sheel').row_values(x)
@@ -445,6 +444,7 @@ class WebAutomation(object):
                         rundescribe = excelcasedata[6]  # 步骤描述
                         caseexecute = excelcasedata[7]  # 用例状态
                         driver.implicitly_wait(60)
+                        startonecasetime = time.time()
                         if excelcasedata[5] == "":  # 等待时间
                             waittime = 2
                         else:
@@ -585,7 +585,7 @@ class WebAutomation(object):
                             print(casereport)
                         endonecasetime = time.time()
                         runonecasetime = round(endonecasetime - startonecasetime, 2)
-                        savedata = "insert into automation_function_web  (`browsername`,`browserconfigure`,`browserstatus`,`operatetype`,`element`,`parameter`,`waittime`,`rundescribe`,`caseexecute`,`runcasetime`,`caseid`,`eventid`,`casereport`,`createdtime`,`updatetime`)VALUES('%s','%s','%s','%s',\"%s\",'%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')" % (
+                        savedata = "insert into automation_function_web  (`browsername`,`browserconfigure`,`browserstatus`,`operatetype`,`element`,`parameter`,`waittime`,`rundescribe`,`caseexecute`,`runcasetime`,`caseid`,`eventid`,`casereport`,`createdtime`,`updatetime`)VALUES('%s','%s','%s','%s',\'''%s\''','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')" % (
                             browsername, browserconfigure, browserstatus, operatetype, element, parameter, waittime,
                             rundescribe,
                             caseexecute,
@@ -594,9 +594,9 @@ class WebAutomation(object):
                             time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
                         try:
                             launchTime.MysqlConnect().saveDatatoMysql("%s" % (savedata))
+                            time.sleep(1)
                         except:
                             print("数据库连接失败，保存数据失败。")
-
                 except:
                     driver.close()
                     driver.quit()
@@ -604,7 +604,7 @@ class WebAutomation(object):
                 driver.quit()
             else:
                 print("浏览%s,状态为不执行，故该浏览器上不运行用例。" % (devicesinfocase[0]))
-                savedata = "insert into automation_function_web  (`browsername`,`browserconfigure`,`browserstatus`,`operatetype`,`element`,`parameter`,`waittime`,`rundescribe`,`caseexecute`,`runcasetime`,`caseid`,`eventid`,`casereport`,`createdtime`,`updatetime`)VALUES('%s','%s','%s','%s',\"%s\",'%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')" % (
+                savedata = "insert into automation_function_web  (`browsername`,`browserconfigure`,`browserstatus`,`operatetype`,`element`,`parameter`,`waittime`,`rundescribe`,`caseexecute`,`runcasetime`,`caseid`,`eventid`,`casereport`,`createdtime`,`updatetime`)VALUES('%s','%s','%s','%s',\'''%s\''','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')" % (
                     browsername, browserconfigure, browserstatus, "", "", "", "",
                     "",
                     "",
@@ -613,6 +613,7 @@ class WebAutomation(object):
                     time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
                 try:
                     launchTime.MysqlConnect().saveDatatoMysql("%s" % (savedata))
+                    time.sleep(1)
                 except:
                     print("数据库连接失败，保存数据失败。")
         tomail = "allenyao224@qq.com,1653838404@qq.com"
