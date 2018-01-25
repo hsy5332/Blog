@@ -1,7 +1,7 @@
-import applicationperformance.launchTime as launchTime  # MAC
+import ApplicationPerformance.applicationfunction.launchTime as launchTime  # MAC
 # import ApplicationPerformance.applicationperformance.launchTime as launchTime  # Windows
 import time
-import sendReport
+import ApplicationPerformance.sendReport as sendReport
 from appium import webdriver
 from appium.webdriver.common.touch_action import TouchAction
 from selenium.common.exceptions import NoSuchElementException  # 导入selenium NoSuchElementException异常模块
@@ -272,6 +272,7 @@ class FunctionAutomation(object):
     # 运行用例
     def runTestCase(self, isquit):
         deviceinfo = launchTime.ReadExcel().readeExcelData('appdeviceinfo')
+        startautomationtime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())  # 开始自动化用例时间
         for i in range(1, deviceinfo.get('caserows')):
             devicescase = deviceinfo.get('excledata_sheel').row_values(i)
             deviceName = devicescase[0]  # 设备名称
