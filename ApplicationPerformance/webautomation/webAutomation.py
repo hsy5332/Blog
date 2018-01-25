@@ -1,7 +1,7 @@
 # to do 发送邮件，以及需要增加用例的执行结果
 import time
-import sendReport
-import applicationperformance.launchTime as launchTime  # MAC
+import ApplicationPerformance.sendReport as sendReport
+import ApplicationPerformance.applicationperformance.launchTime as launchTime  # MAC
 # import ApplicationPerformance.applicationperformance.launchTime as launchTime  # Windows
 
 from selenium import webdriver

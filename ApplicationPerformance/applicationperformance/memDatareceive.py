@@ -1,8 +1,8 @@
 import os
 import time
-import applicationperformance.cpuDatareceive as cpuDatareceive #Mac系统 导入模块重命名
-import applicationperformance.launchTime as launchTime
-import applicationfunction.functionAutomation as functionAutomation
+import ApplicationPerformance.applicationperformance.cpuDatareceive as cpuDatareceive #Mac系统 导入模块重命名
+import ApplicationPerformance.applicationperformance.launchTime as launchTime
+import ApplicationPerformance.applicationfunction.functionAutomation as functionAutomation
 #import ApplicationPerformance.applicationperformance.cpuDatareceive as cpuDatareceive #Windows系统 导入模块重命名
 #import ApplicationPerformance.applicationperformance.launchTime as launchTime
 class MemoryApplicationData(object):

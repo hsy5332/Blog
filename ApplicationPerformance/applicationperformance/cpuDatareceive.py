@@ -1,6 +1,6 @@
-import applicationperformance.launchTime as launchTime  # Mac系统
+import ApplicationPerformance.applicationperformance.launchTime as launchTime  # Mac系统
 #import ApplicationPerformance.applicationperformance.launchTime as launchTime #windows 系统 引入applicationperformance.launchTime 模块重命名为launchTime
-import applicationfunction.functionAutomation as functionAutomation
+import ApplicationPerformance.applicationfunction.functionAutomation as functionAutomation
 import os
 import time
 import platform
