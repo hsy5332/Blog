@@ -53,7 +53,7 @@ def readExcel():
             # 把读取Excel的数据存放到5的表格中(1开始数，备注列)
             tfstr = ("G%s" % (int(excledata_sheel.row_values(i)[0]) + 1))
             sheetform[tfstr] = excledata_sheel.row_values(i)[5]
-            if 1 == int(row_data[4]):  # 判断Excel中设置的方式是否为执行状态
+            if "Y" in row_data[4]:  # 判断Excel中设置的方式是否为执行状态
                 row_list.append(row_data)
                 datastr = row_data[2].replace(' ', '')
                 datastr = datastr.replace(',', '=')  # 格式化row_data[2]参数的字符串
