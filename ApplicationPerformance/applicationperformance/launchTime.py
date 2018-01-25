@@ -168,35 +168,50 @@ class MysqlConnect(object):
 
 # 读取用例
 class ReadExcel(object):
-    def readeExcelData(self, launchtime):
-        if launchtime == 'launchtime':
+    def readeExcelData(self, workname):
+        if workname == 'launchtime':
             excelcase = xlrd.open_workbook("Testcase.xlsx")
             excledata_sheel = excelcase.sheet_by_name('launchtime')
             caserows = excledata_sheel.nrows
             returndata = {'caserows': caserows, 'excledata_sheel': excledata_sheel}
             return returndata
-        elif launchtime == 'cpudata':
+        elif workname == 'cpudata':
             excelcase = xlrd.open_workbook("Testcase.xlsx")
             excledata_sheel = excelcase.sheet_by_name('cpudata')
             caserows = excledata_sheel.nrows
             returndata = {'caserows': caserows, 'excledata_sheel': excledata_sheel}
             return returndata
-        elif launchtime == 'memorydata':
+        elif workname == 'memorydata':
             excelcase = xlrd.open_workbook("Testcase.xlsx")
             excledata_sheel = excelcase.sheet_by_name('memorydata')
             caserows = excledata_sheel.nrows
             returndata = {'caserows': caserows, 'excledata_sheel': excledata_sheel}
             return returndata
-        elif launchtime == 'deviceinfo':
-            excelcase = xlrd.open_workbook("/Volumes/Software/Work/Eclipse/PycharmProjects/ApplicationPerformance/applicationfunction/Testfuncase.xlsx")
-            excledata_sheel = excelcase.sheet_by_name('deviceinfo')
+        #如果这里报错，可以看看，路径是否设置正确，当前配置的是MAC系统的路径，Windows可能有差异，请自行修改。
+        elif workname == 'appdeviceinfo':
+            excelcase = xlrd.open_workbook("/Volumes/Software/Work/Eclipse/PycharmProjects/ApplicationPerformance/applicationfunction/appfuncase.xlsx")
+            excledata_sheel = excelcase.sheet_by_name('appdeviceinfo')
             caserows = excledata_sheel.nrows
             returndata = {'caserows': caserows, 'excledata_sheel': excledata_sheel}
             return returndata
 
-        elif launchtime == 'funcase':
-            excelcase = xlrd.open_workbook("/Volumes/Software/Work/Eclipse/PycharmProjects/ApplicationPerformance/applicationfunction/Testfuncase.xlsx")
-            excledata_sheel = excelcase.sheet_by_name('funcase')
+        elif workname == 'appfuncase':
+            excelcase = xlrd.open_workbook("/Volumes/Software/Work/Eclipse/PycharmProjects/ApplicationPerformance/applicationfunction/appfuncase.xlsx")
+            excledata_sheel = excelcase.sheet_by_name('appfuncase')
+            caserows = excledata_sheel.nrows
+            returndata = {'caserows': caserows, 'excledata_sheel': excledata_sheel}
+            return returndata
+
+        elif workname == "browserinfo":
+            excelcase = xlrd.open_workbook("webfunctioncase.xlsx")
+            excledata_sheel = excelcase.sheet_by_name('browserinfo')
+            caserows = excledata_sheel.nrows
+            returndata = {'caserows': caserows, 'excledata_sheel': excledata_sheel}
+            return returndata
+
+        elif workname == "browseefuncase":
+            excelcase = xlrd.open_workbook("webfunctioncase.xlsx")
+            excledata_sheel = excelcase.sheet_by_name('browseefuncase')
             caserows = excledata_sheel.nrows
             returndata = {'caserows': caserows, 'excledata_sheel': excledata_sheel}
             return returndata

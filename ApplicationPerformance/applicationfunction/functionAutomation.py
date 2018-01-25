@@ -1,7 +1,7 @@
 import applicationperformance.launchTime as launchTime  # MAC
 # import ApplicationPerformance.applicationperformance.launchTime as launchTime  # Windows
 import time
-
+import sendReport
 from appium import webdriver
 from appium.webdriver.common.touch_action import TouchAction
 from selenium.common.exceptions import NoSuchElementException  # 导入selenium NoSuchElementException异常模块
@@ -271,7 +271,7 @@ class FunctionAutomation(object):
 
     # 运行用例
     def runTestCase(self, isquit):
-        deviceinfo = launchTime.ReadExcel().readeExcelData('deviceinfo')
+        deviceinfo = launchTime.ReadExcel().readeExcelData('appdeviceinfo')
         for i in range(1, deviceinfo.get('caserows')):
             devicescase = deviceinfo.get('excledata_sheel').row_values(i)
             deviceName = devicescase[0]  # 设备名称
@@ -287,7 +287,7 @@ class FunctionAutomation(object):
             if "Y" in devicesexecute:
                 devicesinfo = FunctionAutomation().originalDevices(deviceName, platformName, platformVersion,
                                                                    appPackage, appActivity, udid)  # 连接测试设备
-                casedata = launchTime.ReadExcel().readeExcelData('funcase')  # 读取自动化用例数据
+                casedata = launchTime.ReadExcel().readeExcelData('appfuncase')  # 读取自动化用例数据
                 endcasenumber = []
                 casenumber = []
                 for j in range(1, casedata.get('caserows')):  # Excel中的测试用例数据，使用for遍历每一行的数据，进行判断执行对应的操作
@@ -298,6 +298,7 @@ class FunctionAutomation(object):
                         casenumber.append(j)
                     if "end" in operatetype:
                         endcasenumber.append(j)
+                casecount = casedata.get('caserows') - 1  # 用例总数
                 if platformName == "Android":
                     try:
                         driver = webdriver.Remote('http://localhost:%s/wd/hub' % (port), devicesinfo)  # 连接Appium
@@ -306,7 +307,7 @@ class FunctionAutomation(object):
                         x = 1
                         ifnumber = 0
                         startonecasetime = time.time()
-                        while x < casedata.get('caserows'):  # Excel中的测试用例数据，使用for遍历每一行的数据，进行判断执行对应的操作
+                        while x <= casedata.get('caserows'):  # Excel中的测试用例数据，使用for遍历每一行的数据，进行判断执行对应的操作
                             excelcasedata = casedata.get('excledata_sheel').row_values(
                                 x)
                             x = x + 1
@@ -522,7 +523,9 @@ class FunctionAutomation(object):
                     time.sleep(1)
                 except:
                     print("数据库连接失败，保存数据失败。")
-
+        tomail = "allenyao224@qq.com,1653838404@qq.com"
+        ccemail = "268455431@qq.com"
+        print(sendReport.SendReport().senderEmail(tomail, ccemail, startautomationtime, casecount))
 
 if __name__ == "__main__":
     FunctionAutomation().runTestCase("Noopen")

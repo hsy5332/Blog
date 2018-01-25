@@ -233,6 +233,46 @@ class WebAutomation(object):
             except:
                 casereport = "用例编号:%s,执行不通过。" % (caseid)
                 return casereport
+        elif operatetype == "if包含_id":
+            try:
+                driver.find_element_by_id(element)
+                casereport = "用例编号:%s,执行通过。" % (caseid)
+                return casereport
+            except:
+                casereport = "用例编号:%s,执行不通过。" % (caseid)
+                return casereport
+        elif operatetype == "if包含_xpath":
+            try:
+                driver.find_element_by_xpath(element)
+                casereport = "用例编号:%s,执行通过。" % (caseid)
+                return casereport
+            except:
+                casereport = "用例编号:%s,执行不通过。" % (caseid)
+                return casereport
+        elif operatetype == "if包含_textname":
+            try:
+                driver.find_elements_by_name(element)[0]
+                casereport = "用例编号:%s,执行通过。" % (caseid)
+                return casereport
+            except:
+                casereport = "用例编号:%s,执行不通过。" % (caseid)
+                return casereport
+        elif operatetype == "if包含_classname":
+            try:
+                driver.find_elements_by_class_name(element)[0]
+                casereport = "用例编号:%s,执行通过。" % (caseid)
+                return casereport
+            except:
+                casereport = "用例编号:%s,执行不通过。" % (caseid)
+                return casereport
+        elif operatetype == "if包含_linkname":
+            try:
+                driver.find_elements_by_link_text(element)[0]
+                casereport = "用例编号:%s,执行通过。" % (caseid)
+                return casereport
+            except:
+                casereport = "用例编号:%s,执行不通过。" % (caseid)
+                return casereport
         else:
             casereport = "用例编号:%s,执行不通过，该用例的元素属性或参数可能有问题，请检查该用例。" % (caseid)
             return casereport
@@ -428,10 +468,21 @@ class WebAutomation(object):
                 time.sleep(5)
                 driver.get(testurl)
                 casedata = launchTime.ReadExcel().readeExcelData('browseefuncase')  # 读取自动化用例数据
+                endcasenumber = []
+                casenumber = []
+                for j in range(1, casedata.get('caserows')):  # Excel中的测试用例数据，使用for遍历每一行的数据，进行判断执行对应的操作
+                    excelcasedata = casedata.get('excledata_sheel').row_values(
+                        j)
+                    operatetype = excelcasedata[1]
+                    if "if" in operatetype:
+                        casenumber.append(j)
+                    if "end" in operatetype:
+                        endcasenumber.append(j)
                 x = 1
+                ifnumber = 0
                 try:
                     casecount = casedata.get('caserows')-1  # 用例总数
-                    while x < casecount:
+                    while x <= casecount:
                         excelcasedata = casedata.get('excledata_sheel').row_values(x)
                         x = x + 1
                         try:
@@ -511,6 +562,74 @@ class WebAutomation(object):
                             elif operatetype == "查找_linkname":
                                 print(WebAutomation().operateCheckElement(operatetype, element, driver, caseid))
                                 time.sleep(waittime)
+                            elif operatetype == "end":
+                                casereport = "用例编号:%s,执行通过。" % (caseid)
+                                print(casereport)
+                            elif "if" in operatetype:
+                                if operatetype == "if包含_id":
+                                    casereport = WebAutomation().operateCheckElement(operatetype, element,
+                                                                                          driver, caseid)
+                                    if "执行通过" in casereport:
+                                        print(casereport)
+                                    else:
+                                        print(casereport)
+                                        if len(endcasenumber) == len(casenumber):
+                                            x = endcasenumber[ifnumber]
+                                        else:
+                                            print("当前用例中的if和and不等，请检查用例")
+                                            x = endcasenumber[-1]
+                                elif "if包含_xpath":
+                                    casereport = WebAutomation().operateCheckElement(operatetype, element,
+                                                                                          driver, caseid)
+                                    if "执行通过" in casereport:
+                                        print(casereport)
+                                    else:
+                                        print(casereport)
+                                        if len(endcasenumber) == len(casenumber):
+                                            x = endcasenumber[ifnumber]
+                                        else:
+                                            print("当前用例中的if和and不等，请检查用例")
+                                            x = endcasenumber[-1]
+                                elif "if包含_classname":
+                                    casereport = WebAutomation().operateCheckElement(operatetype, element,
+                                                                                          driver, caseid)
+                                    if "执行通过" in casereport:
+                                        print(casereport)
+                                    else:
+                                        print(casereport)
+                                        if len(endcasenumber) == len(casenumber):
+                                            x = endcasenumber[ifnumber]
+                                        else:
+                                            print("当前用例中的if和and不等，请检查用例")
+                                            x = endcasenumber[-1]
+                                elif "if包含_textname":
+                                    casereport = WebAutomation().operateCheckElement(operatetype, element,
+                                                                                          driver, caseid)
+                                    if "执行通过" in casereport:
+                                        print(casereport)
+                                    else:
+                                        print(casereport)
+                                        if len(endcasenumber) == len(casenumber):
+                                            x = endcasenumber[ifnumber]
+                                        else:
+                                            print("当前用例中的if和and不等，请检查用例")
+                                            x = endcasenumber[-1]
+                                elif "if包含_linkname":
+                                    casereport = WebAutomation().operateCheckElement(operatetype, element,
+                                                                                          driver, caseid)
+                                    if "执行通过" in casereport:
+                                        print(casereport)
+                                    else:
+                                        print(casereport)
+                                        if len(endcasenumber) == len(casenumber):
+                                            x = endcasenumber[ifnumber]
+                                        else:
+                                            print("当前用例中的if和and不等，请检查用例")
+                                            x = endcasenumber[-1]
+                                else:
+                                    casereport = "用例编号:%s操作类型错误,该用例不执行。" % (caseid)
+                                    print(casereport)
+                                ifnumber = ifnumber + 1
                             elif operatetype == "查找_classname":
                                 print(WebAutomation().operateCheckElement(operatetype, element, driver, caseid))
                                 time.sleep(waittime)
