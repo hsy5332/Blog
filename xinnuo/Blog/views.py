@@ -20,7 +20,7 @@ def index(request):
 # token计算规则
 def token(token):
     try:
-        if int(token) + 86400 > int(time.time()): # 86400是一天的时间戳
+        if int(token) + 86400 > int(time.time()):  # 86400是一天的时间戳
             return True
         else:
             return False
@@ -471,7 +471,7 @@ def search(request):
                 returnvalues = []
                 # 创建一个values的列表
                 returndic = {}
-                # 创建字典，在遍历的时候，把单组的数据存入字典，再情清空字典
+                # 创建字典，在遍历的时候，把单组的数据存入字典，再清空字典
                 returndata = []
                 # 把遍历得来的字典存入列表作为返回数据
                 for x in datasource:
@@ -638,3 +638,131 @@ def editarticle(request):
     else:
         articledetails_requesterror = {"code": "-12", "msg": "请求方式错误！", "data": {}}
         return HttpResponse(json.dumps(articledetails_requesterror))
+
+
+# 更换封面接口
+
+
+
+
+# 获取用户信息接口
+def requestuserinfo(request):
+    if request.POST:
+        if token(request.POST['token']):
+
+            print(request.POST['userid'], request.POST['username'])
+            try:
+                userInfo = models.user.objects.get(id=request.POST['userid'], username=request.POST['username'],
+                                                   userstatus='1')
+                userInfodata = {
+                    "id": userInfo.id,
+                    "username": userInfo.id,
+                    "realname": userInfo.realname,
+                    "nickname": userInfo.nickname,
+                    "phonenumber": userInfo.phonenumber,
+                    "emailaddress": userInfo.emailaddress,
+                    "head": userInfo.head,
+                    "birthday": userInfo.birthday,
+                    "useraddress": userInfo.useraddress,
+                    "sex": userInfo.sex,
+                    "userstatus": userInfo.userstatus,
+                    "createdtime": userInfo.createdtime,
+                    "updatetime": userInfo.updatetime,
+                }
+                return HttpResponse(json.dumps({"code": "200", "msg": "Success!", "dara": userInfodata}))
+            except:
+                requestuserinfo_notquery = {"code": "216", "msg": "数据未不存在", "data": {}}
+                return HttpResponse(json.dumps(requestuserinfo_notquery))
+        else:
+            requestuserinfo_tokenInvalid = {"code": "-11", "msg": "token过期", "data": {}}
+            return HttpResponse(json.dumps(requestuserinfo_tokenInvalid))
+    else:
+        requestuserinfo_requesterror = {"code": "-12", "msg": "请求方式错误！", "data": {}}
+        return HttpResponse(json.dumps(requestuserinfo_requesterror))
+
+
+# 修改用户信息
+def edituserinfo(request):
+    if request.POST:
+        if token(request.POST['token']):
+            if request.POST['birthday'] != "":
+                try:
+                    userinfo = models.user.objects.get(id=request.POST['userid'],
+                                                       username=request.POST['username'],
+                                                       phonenumber=request.POST['phonenumber'],
+                                                       userstatus='1'
+                                                       )
+                    # 更新数据库数据
+                    userinfo.realname = request.POST['realname']
+                    userinfo.nickname = request.POST['nickname']
+                    userinfo.phonenumber = request.POST['phonenumber']
+                    userinfo.emailaddress = request.POST['emailaddress']
+                    userinfo.head = request.POST['head']
+                    userinfo.birthday = request.POST['birthday']
+                    userinfo.useraddress = request.POST['useraddress']
+                    userinfo.sex = request.POST['sex']
+                    userinfo.updatetime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+                    userinfo.save()
+                    userinfodata = {
+                        "userid": userinfo.id,
+                        "username": userinfo.username,
+                        "realname": userinfo.realname,
+                        "nickname": userinfo.nickname,
+                        "phonenumber": userinfo.phonenumber,
+                        "emailaddress": userinfo.emailaddress,
+                        "head": userinfo.emailaddress,
+                        "birthday": userinfo.birthday,
+                        "useraddress": userinfo.useraddress,
+                        "sex": userinfo.sex,
+                        "updatetime": userinfo.updatetime,
+                        "createdtime": userinfo.createdtime
+                    }
+                    print(userinfodata)
+                    return HttpResponse(json.dumps({"code": "200", "msg": "Success!", "data": userinfodata}))
+                except:
+                    edituserinfo_createdDataerror = {"code": "-10", "msg": "ERROR！", "data": {}}
+                    return HttpResponse(json.dumps(edituserinfo_createdDataerror))
+            else:
+                try:
+                    userinfo = models.user.objects.get(id=request.POST['userid'],
+                                                       username=request.POST['username'],
+                                                       phonenumber=request.POST['phonenumber'],
+                                                       userstatus='1'
+                                                       )
+                    # 更新数据库数据
+                    userinfo.realname = request.POST['realname']
+                    userinfo.nickname = request.POST['nickname']
+                    userinfo.phonenumber = request.POST['phonenumber']
+                    userinfo.emailaddress = request.POST['emailaddress']
+                    userinfo.head = request.POST['head']
+                    userinfo.birthday = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+                    userinfo.useraddress = request.POST['useraddress']
+                    userinfo.sex = request.POST['sex']
+                    userinfo.updatetime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+                    userinfo.save()
+                    userinfodata = {
+                        "userid": userinfo.id,
+                        "username": userinfo.username,
+                        "realname": userinfo.realname,
+                        "nickname": userinfo.nickname,
+                        "phonenumber": userinfo.phonenumber,
+                        "emailaddress": userinfo.emailaddress,
+                        "head": userinfo.emailaddress,
+                        "birthday": userinfo.birthday,
+                        "useraddress": userinfo.useraddress,
+                        "sex": userinfo.sex,
+                        "updatetime": userinfo.updatetime,
+                        "createdtime": userinfo.createdtime
+                    }
+                    print(userinfodata)
+                    return HttpResponse(
+                        json.dumps({"code": "200", "msg": "Success,生日时间格式为空，已经修改为当前时间!", "data": userinfodata}))
+                except:
+                    edituserinfo_createdDataerror = {"code": "-10", "msg": "ERROR！", "data": {}}
+                    return HttpResponse(json.dumps(edituserinfo_createdDataerror))
+        else:
+            requestedituserinfo_tokenInvalid = {"code": "-11", "msg": "token过期", "data": {}}
+            return HttpResponse(json.dumps(requestedituserinfo_tokenInvalid))
+    else:
+        edituserinfo_requesterror = {"code": "-12", "msg": "请求方式错误！", "data": {}}
+        return HttpResponse(json.dumps(edituserinfo_requesterror))

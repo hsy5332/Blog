@@ -25,7 +25,8 @@ SECRET_KEY = 'o^gjga2q064icz$_ulte2+(8@(e!vp_4yq2sa4%z%bp+1lm40v'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+#ALLOWED_HOSTS = [] 本机
+ALLOWED_HOSTS = ['*',]
 
 
 # Application definition
@@ -100,9 +101,10 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'test', #表名
         'USER': 'huangshunyao',
-        'PASSWORD': "hsy5332!",
-        'HOST': "steel.iask.in",
-        'PORT': '33067',
+        'PASSWORD': "Hsy5332#",
+        #'HOST': "steel.iask.in",
+        'HOST': "192.168.1.9",
+        'PORT': '33006',
     }
 }
 
