@@ -14,4 +14,5 @@ urlpatterns = [
     url(r'^editarticle', views.editarticle),  # 编辑文章接口
     url(r'^requestuserinfo',views.requestuserinfo), #获取用户信息
     url(r"^edituserinfo",views.edituserinfo),#修改用户信息
+    #评论、收藏、
 ]

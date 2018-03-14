@@ -519,6 +519,9 @@ def details(request):
                     "updatetime": articleinfo.updatetime,
                     "createdtime": articleinfo.createdtime
                 }
+                # 增加阅读记录
+                addreadrecord = models.count.objects.create(articleid=request.POST['articleid'],
+                                                           readUserid=request.POST['readuserid'],createdtime=time.strftime("%Y-%m-%d %H:%M:%S",time.localtime()),updatetime=time.strftime("%Y-%m-%d %H:%M:%S",time.localtime()))
                 returndata = {"code": "200", "msg": "Success！", "data": articleDetailsdata}
                 return HttpResponse(json.dumps(returndata))
             except:

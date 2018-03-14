@@ -95,7 +95,7 @@ DATABASES = {
         'PORT': '3306',
     }
 }
-'''
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -105,6 +105,17 @@ DATABASES = {
         #'HOST': "steel.iask.in",
         'HOST': "192.168.1.9",
         'PORT': '33006',
+    }
+}
+'''
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'test', #表名
+        'USER': 'huangshunyao',
+        'PASSWORD': "Hsy5332#",
+        'HOST': "steel.iask.in",
+        'PORT': '19008',
     }
 }
 
