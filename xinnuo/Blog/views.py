@@ -508,6 +508,12 @@ def details(request):
             try:
                 articleinfo = models.article.objects.get(articleid=request.POST['articleid'])
                 author = models.user.objects.get(id=str(articleinfo.authorid))
+                try:
+                    models.collection_record.objects.get(collentionarticleid=request.POST['artcileid'],
+                                                         collentionUserid=request.POST['readuserid'])
+                    iscollection = 1
+                except:
+                    iscollection = 0
                 articleDetailsdata = {
                     "articleid": articleinfo.articleid,
                     "articletitle": articleinfo.articletitle,
@@ -517,11 +523,16 @@ def details(request):
                     "classifyid": articleinfo.classifyid,
                     "coverpicture": articleinfo.coverpicture,
                     "updatetime": articleinfo.updatetime,
-                    "createdtime": articleinfo.createdtime
+                    "createdtime": articleinfo.createdtime,
+                    "iscollection": iscollection
                 }
                 # 增加阅读记录
                 addreadrecord = models.count.objects.create(articleid=request.POST['articleid'],
-                                                           readUserid=request.POST['readuserid'],createdtime=time.strftime("%Y-%m-%d %H:%M:%S",time.localtime()),updatetime=time.strftime("%Y-%m-%d %H:%M:%S",time.localtime()))
+                                                            readUserid=request.POST['readuserid'],
+                                                            createdtime=time.strftime("%Y-%m-%d %H:%M:%S",
+                                                                                      time.localtime()),
+                                                            updatetime=time.strftime("%Y-%m-%d %H:%M:%S",
+                                                                                     time.localtime()))
                 returndata = {"code": "200", "msg": "Success！", "data": articleDetailsdata}
                 return HttpResponse(json.dumps(returndata))
             except:
@@ -669,6 +680,7 @@ def requestuserinfo(request):
                     "useraddress": userInfo.useraddress,
                     "sex": userInfo.sex,
                     "userstatus": userInfo.userstatus,
+                    "iscomment：": userInfo.iscomment,
                     "createdtime": userInfo.createdtime,
                     "updatetime": userInfo.updatetime,
                 }
@@ -769,3 +781,42 @@ def edituserinfo(request):
     else:
         edituserinfo_requesterror = {"code": "-12", "msg": "请求方式错误！", "data": {}}
         return HttpResponse(json.dumps(edituserinfo_requesterror))
+
+
+# 发布评论
+
+def postcommit(request):
+    if request.POST:
+        if token(request.POST['token']):
+            try:
+                if int(models.user.objects.get(id=request.POST['userid']).iscomment) == 0:
+                    try:
+                        models.user.objects.get(id=request.POST['userid'], userstatus=1)
+                        models.article.objects.get(articleid=request.POST['articleid'])
+                        models.comment.objects.create(createrid=request.POST['userid'],
+                                                      articleid=request.POST['articleid'],
+                                                      commentcontent=request.POST['commentcontent'],
+                                                      isdel=0,
+                                                      createdtime=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
+                                                      updatetime=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+                                                      )
+                        successdata = {"code" : "200", "msg" : "success", "data" : {} }
+                        return HttpResponse(json.dumps(successdata))
+                    except:
+                        postcommit_userdatanotfound = {"code": "2181", "msg": "用户数据不存在", "data": {}}
+                        return HttpResponse(json.dumps(postcommit_userdatanotfound))
+                elif int(models.user.objects.get(id=request.POST['userid']).iscomment) == 1:
+                    postcommit_usernotcomment = {"code": "217", "msg": "用户被禁言", "data": {}}
+                    return HttpResponse(json.dumps(postcommit_usernotcomment))
+                else:
+                    postcommit_userdatanotfound = {"code": "2182", "msg": "用户数据不存在", "data": {}}
+                    return HttpResponse(json.dumps(postcommit_userdatanotfound))
+            except:
+                postcommit_userdatanotfound = {"code": "2183", "msg": "用户数据不存在", "data": {}}
+                return HttpResponse(json.dumps(postcommit_userdatanotfound))
+        else:
+            postcommit_tokenInvalid = {"code": "-11", "msg": "token过期", "data": {}}
+            return HttpResponse(json.dumps(postcommit_tokenInvalid))
+    else:
+        postcommit_requesterror = {"code": "-12", "msg": "请求方式错误！", "data": {}}
+        return HttpResponse(json.dumps(postcommit_requesterror))

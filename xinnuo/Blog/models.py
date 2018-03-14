@@ -42,7 +42,7 @@ class comment(models.Model):
     commentid = models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='commentid')
     createrid = models.CharField(max_length=11)
     articleid = models.CharField(max_length=11)
-    commentcontent = models.TextField(null=True)
+    commentcontent = models.TextField(null=True,max_length=500)
     isdel = models.CharField(max_length=4)
     createdtime = models.DateTimeField(default='auto_now_add')
     updatetime = models.DateTimeField(default='auto_now')
@@ -112,6 +112,7 @@ class user(models.Model):
     useraddress = models.CharField(max_length=100)
     sex = models.CharField(max_length=4)
     userstatus = models.CharField(max_length=4)
+    iscomment = models.CharField(max_length=4)
     createdtime = models.DateTimeField(default='auto_now_add')
     updatetime = models.DateTimeField(default='auto_now')
 
