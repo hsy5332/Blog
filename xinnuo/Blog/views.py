@@ -820,3 +820,43 @@ def postcommit(request):
     else:
         postcommit_requesterror = {"code": "-12", "msg": "请求方式错误！", "data": {}}
         return HttpResponse(json.dumps(postcommit_requesterror))
+
+#获取评论
+def requestcomment(request):
+    if request.POST:
+        if token(request.POST['token']):
+            try:
+                data = models.comment.objects.filter(articleid=request.POST['articleid'])
+                datalist = []
+                for x in range(0, len(data)):
+                    userinfo = models.user.objects.get(id=data[x].createrid)
+                    datainfo = {
+                        "commentid": data[x].commentid,
+                        "userid": data[x].createrid,
+                        "articleid": data[x].articleid,
+                        "commentcontent": data[x].commentcontent,
+                        "isdel": data[x].isdel,
+                        "likecount": data[x].likecount,
+                        "commentcreatedtime": data[x].createdtime,
+                        "commentupdatetime": data[x].updatetime,
+                        "username": userinfo.username,
+                        "realname": userinfo.realname,
+                        "nickname": userinfo.nickname,
+                        "phonenumber": userinfo.phonenumber,
+                        "head": userinfo.head,
+                        "userstatus": userinfo.userstatus,
+                        "usercreatedtime": userinfo.createdtime,
+                        "userupdatetime": userinfo.updatetime
+                    }
+                    datalist.append(datainfo)
+                successdata = {"code": "200", "msg": "success", "data": datalist}
+                return HttpResponse(json.dumps(successdata))
+            except:
+                requestcomment_userdatanotfound = {"code": "218", "msg": "用户数据不存在", "data": {}}
+                return HttpResponse(json.dumps(requestcomment_userdatanotfound))
+        else:
+            requestcomment_tokenInvalid = {"code": "-11", "msg": "token过期", "data": {}}
+            return HttpResponse(json.dumps(requestcomment_tokenInvalid))
+    else:
+        requestcomment_requesterror = {"code": "-12", "msg": "请求方式错误！", "data": {}}
+        return HttpResponse(json.dumps(requestcomment_requesterror))

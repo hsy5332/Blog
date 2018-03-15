@@ -14,6 +14,7 @@ urlpatterns = [
     url(r'^editarticle', views.editarticle),  # 编辑文章接口
     url(r'^requestuserinfo',views.requestuserinfo), #获取用户信息
     url(r'^edituserinfo',views.edituserinfo),#修改用户信息
-    url('^postcommit',views.postcommit)#发布评论
+    url('^postcommit',views.postcommit),#发布评论
+    url('^requestcomment',views.requestcomment)#获取评论
     #发布评论、获取评论、点击收藏、（文章详情加一个是否被收藏,用户信息）收藏、
 ]

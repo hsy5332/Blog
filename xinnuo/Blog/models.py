@@ -44,6 +44,7 @@ class comment(models.Model):
     articleid = models.CharField(max_length=11)
     commentcontent = models.TextField(null=True,max_length=500)
     isdel = models.CharField(max_length=4)
+    likecount = models.CharField(max_length=10)
     createdtime = models.DateTimeField(default='auto_now_add')
     updatetime = models.DateTimeField(default='auto_now')
 
