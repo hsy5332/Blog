@@ -30,8 +30,8 @@ class article_classify(models.Model):
 #collection_record 收藏记录表
 class collection_record(models.Model):
     collectionid = models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='collectionid')
-    collentionUserid = models.CharField(max_length=11)
-    collentionarticleid = models.CharField(max_length=11)
+    collectionUserid = models.CharField(max_length=11)
+    collectionarticleid = models.CharField(max_length=11)
     iscollection = models.CharField(max_length=4)
     createdtime = models.DateTimeField(default='auto_now_add')
     updatetime = models.DateTimeField(default='auto_now')

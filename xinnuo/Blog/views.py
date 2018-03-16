@@ -509,11 +509,29 @@ def details(request):
                 articleinfo = models.article.objects.get(articleid=request.POST['articleid'])
                 author = models.user.objects.get(id=str(articleinfo.authorid))
                 try:
-                    models.collection_record.objects.get(collentionarticleid=request.POST['artcileid'],
-                                                         collentionUserid=request.POST['readuserid'])
-                    iscollection = 1
+                    iscollectioncount = models.collection_record.objects.filter(
+                        collectionarticleid=request.POST['articleid'],
+                        collectionUserid=request.POST['readuserid'], iscollection=1)
+                    if len(iscollectioncount) > 0:
+                        iscollection = 1
+                    else:
+                        iscollection = 0
                 except:
                     iscollection = 0
+                # 增加阅读记录
+                addreadrecord = models.count.objects.create(articleid=request.POST['articleid'],
+                                                            readUserid=request.POST['readuserid'],
+                                                            createdtime=time.strftime("%Y-%m-%d %H:%M:%S",
+                                                                                      time.localtime()),
+                                                            updatetime=time.strftime("%Y-%m-%d %H:%M:%S",
+                                                                                     time.localtime()))
+
+                try:
+                    collectioncount = len(
+                        models.collection_record.objects.filter(collectionarticleid=request.POST['articleid'],
+                                                                iscollection=1))
+                except:
+                    collectioncount = 0
                 articleDetailsdata = {
                     "articleid": articleinfo.articleid,
                     "articletitle": articleinfo.articletitle,
@@ -524,15 +542,9 @@ def details(request):
                     "coverpicture": articleinfo.coverpicture,
                     "updatetime": articleinfo.updatetime,
                     "createdtime": articleinfo.createdtime,
-                    "iscollection": iscollection
+                    "iscollection": iscollection,
+                    "collectioncount": collectioncount
                 }
-                # 增加阅读记录
-                addreadrecord = models.count.objects.create(articleid=request.POST['articleid'],
-                                                            readUserid=request.POST['readuserid'],
-                                                            createdtime=time.strftime("%Y-%m-%d %H:%M:%S",
-                                                                                      time.localtime()),
-                                                            updatetime=time.strftime("%Y-%m-%d %H:%M:%S",
-                                                                                     time.localtime()))
                 returndata = {"code": "200", "msg": "Success！", "data": articleDetailsdata}
                 return HttpResponse(json.dumps(returndata))
             except:
@@ -800,7 +812,7 @@ def postcommit(request):
                                                       createdtime=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
                                                       updatetime=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
                                                       )
-                        successdata = {"code" : "200", "msg" : "success", "data" : {} }
+                        successdata = {"code": "200", "msg": "success", "data": {}}
                         return HttpResponse(json.dumps(successdata))
                     except:
                         postcommit_userdatanotfound = {"code": "2181", "msg": "用户数据不存在", "data": {}}
@@ -821,7 +833,8 @@ def postcommit(request):
         postcommit_requesterror = {"code": "-12", "msg": "请求方式错误！", "data": {}}
         return HttpResponse(json.dumps(postcommit_requesterror))
 
-#获取评论
+
+# 获取评论
 def requestcomment(request):
     if request.POST:
         if token(request.POST['token']):
@@ -860,3 +873,36 @@ def requestcomment(request):
     else:
         requestcomment_requesterror = {"code": "-12", "msg": "请求方式错误！", "data": {}}
         return HttpResponse(json.dumps(requestcomment_requesterror))
+
+
+#点击收藏
+def clickcollect(request):
+    if request.POST:
+        if token(request.POST['token']):
+            try:
+                userinfoverify = models.user.objects.filter(id=request.POST['userid'])
+                articleverify = models.article.objects.filter(articleid=request.POST['articleid'])
+                if userinfoverify and articleverify and int(request.POST['userid']) >= 0:
+                    models.collection_record.objects.create(collectionUserid=request.POST['userid'],
+                                                            collectionarticleid=request.POST['articleid'],
+                                                            iscollection=1,
+                                                            createdtime=time.strftime("%Y-%m-%d %H:%M:%S",
+                                                                                      time.localtime()),
+                                                            updatetime=time.strftime("%Y-%m-%d %H:%M:%S",
+                                                                                     time.localtime())
+                                                            )
+                    clickcollect_data = {"code": "200", "msg": "success", "data": {}}
+                    return HttpResponse(json.dumps(clickcollect_data))
+                else:
+                    clickcollect_dataerror = {"code": "216", "msg": "数据不存在", "data": {}}
+                    return HttpResponse(json.dumps(clickcollect_dataerror))
+            except:
+                clickcollect_dataerror = {'code': "-10", 'msg': 'ERROR', 'data': ''}
+                return HttpResponse(json.dumps(clickcollect_dataerror))
+
+        else:
+            clickcollect_tokenInvalid = {"code": "-11", "msg": "token过期", "data": {}}
+            return HttpResponse(json.dumps(clickcollect_tokenInvalid))
+    else:
+        clickcollect_requesterror = {"code": "-12", "msg": "请求方式错误！", "data": {}}
+        return HttpResponse(json.dumps(clickcollect_requesterror))
