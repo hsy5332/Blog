@@ -7,5 +7,19 @@
 <body>
 <h1> HELLO WORLD ! tihis is Blog</h1>
 <h1>{{ TEST }}</h1>
+<p >
+    <img src="/static/1521267948451.jpg" style="width: 500px; height: 500px;" />
+</p>
+
+<div>
+    <form method="POST" enctype="multipart/form-data" action="/Blog/upfile">
+        token<input type="text" name="token">
+        userid<input type="text" name="userid">
+        filetype<input type="text" name="filetype">
+        <input type="file" name="filename">
+
+        <button type="submit">上传</button>
+    </form>
+</div>
 </body>
 </html>

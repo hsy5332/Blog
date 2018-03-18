@@ -1,5 +1,6 @@
 import time
 import json
+import os
 import pdb
 # pdb.set_trace()
 from django.http import HttpResponse
@@ -7,14 +8,13 @@ from django.shortcuts import render
 from urllib.parse import quote
 from urllib.request import urlopen  # quote,urlopen发送短信的接口使用
 from random import randint  # random.randint是随机取数的，发送短信的接口使用
-
 from Blog import models
 
 
 def index(request):
     user = models.user.objects.get(id=1)
 
-    return render(request, 'index.html', {"TEST": user})
+    return render(request, 'index.html', {"TEST": user.username})
 
 
 # token计算规则
@@ -875,7 +875,7 @@ def requestcomment(request):
         return HttpResponse(json.dumps(requestcomment_requesterror))
 
 
-#点击收藏
+# 点击收藏
 def clickcollect(request):
     if request.POST:
         if token(request.POST['token']):
@@ -906,3 +906,68 @@ def clickcollect(request):
     else:
         clickcollect_requesterror = {"code": "-12", "msg": "请求方式错误！", "data": {}}
         return HttpResponse(json.dumps(clickcollect_requesterror))
+
+
+# 上传文件接口
+
+def upfile(request):
+    if request.POST:
+        if token(request.POST['token']):
+            try:
+                userinfo = models.user.objects.filter(id=request.POST['userid'])
+                if userinfo and int(request.POST['userid']) >= 0:
+                    filename = request.FILES.get("filename", None)
+                    if not filename:
+                        foundfilename = {"code": "-219", "msg": "文件名不能为空", "data": {}}
+                        return HttpResponse(json.dumps(foundfilename))
+                    else:
+                        if request.POST['filetype'] == "file":
+                            writefile = open(os.path.join("static\\file", str(filename)), 'wb+')
+                            for chunk in filename.chunks():
+                                writefile.write(chunk)
+                            writefile.close()
+                            upsuccess = {"code": "200", "msg": "Success！", "data": {}}
+                            return HttpResponse(json.dumps(upsuccess))
+                        elif request.POST['filetype'] == "img":
+                            writefile = open(os.path.join("static\\img", str(filename)), 'wb+')
+                            for x in filename.chunks():
+                                writefile.write(x)
+                            writefile.close()
+                            try:
+                                models.user.objects.filter(id=request.POST['userid']).update(
+                                    head="/static/img/" + str(filename),
+                                    updatetime=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+                                upsuccess = {"code": "200", "msg": "Success！", "data": {}}
+                                return HttpResponse(json.dumps(upsuccess))
+                            except:
+                                upfile_savedataerror = {"code": "220", "msg": "保存数据失败", "data": {}}
+                                return HttpResponse(json.dumps(upfile_savedataerror))
+                        elif request.POST['filetype'] == "audio":
+                            writefile = open(os.path.join("static\\audio", str(filename)), 'wb+')
+                            for x in filename.chunks():
+                                writefile.write(x)
+                            writefile.close()
+                            upsuccess = {"code": "200", "msg": "Success！", "data": {}}
+                            return HttpResponse(json.dumps(upsuccess))
+                        elif request.POST['filetype'] == "video":
+                            writefile = open(os.path.join("static\\video", str(filename)), 'wb+')
+                            for x in filename.chunks():
+                                writefile.write(x)
+                            writefile.close()
+                            upsuccess = {"code": "200", "msg": "Success！", "data": {}}
+                            return HttpResponse(json.dumps(upsuccess))
+                        else:
+                            upfile_erro = {"code": "-10", "msg": "ERROR 参数错误", "data": {}}
+                            return HttpResponse(json.dumps(upfile_erro))
+                else:
+                    upfile_dataerror = {"code": "216", "msg": "用户ID数据不存在", "data": {}}
+                    return HttpResponse(json.dumps(upfile_dataerror))
+            except:
+                upfile_erro = {"code": "-10", "msg": "ERROR 参数错误", "data": {}}
+                return HttpResponse(json.dumps(upfile_erro))
+        else:
+            upfile_tokenInvalid = {"code": "-11", "msg": "token过期", "data": {}}
+            return HttpResponse(json.dumps(upfile_tokenInvalid))
+    else:
+        upfile_requesterror = {"code": "-12", "msg": "请求方式错误！", "data": {}}
+        return HttpResponse(json.dumps(upfile_requesterror))

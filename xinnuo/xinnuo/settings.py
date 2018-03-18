@@ -107,7 +107,7 @@ DATABASES = {
         'PORT': '33006',
     }
 }
-'''
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -118,7 +118,19 @@ DATABASES = {
         'PORT': '19008',
     }
 }
+'''
 
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'test', #表名
+        'USER': 'huangshunyao',
+        'PASSWORD': "Hsy5332#",
+        #'HOST': "steel.iask.in",
+        'HOST': "192.168.1.9",
+        'PORT': '33006',
+    }
+}
 
 
 # Password validation
@@ -158,3 +170,4 @@ USE_TZ = False
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')

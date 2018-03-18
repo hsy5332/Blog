@@ -1,6 +1,8 @@
+import os
 from django.conf.urls import url
 from Blog import views
-
+from django.conf import settings
+from django.conf.urls.static import static
 urlpatterns = [
     url(r'^index', views.index),
     url(r'^login', views.login),  # 登录接口
@@ -16,6 +18,9 @@ urlpatterns = [
     url(r'^edituserinfo',views.edituserinfo),#修改用户信息
     url('^postcommit',views.postcommit),#发布评论
     url('^requestcomment',views.requestcomment),#获取评论
-    url('^clickcollect',views.clickcollect),#收藏文章接口
-    #发布评论、获取评论、点击收藏、（文章详情加一个是否被收藏,用户信息）收藏、
-]
+    url('^clickcollect',views.clickcollect),#点击收藏
+    url('^upfile',views.upfile)#上传文件
+
+] + static(settings.STATIC_URL,docment_root = settings.STATIC_ROOT)
+
+#上传头像、上传文章封面、
