@@ -704,7 +704,7 @@ class WebAutomation(object):
                             print(casereport)
                         endonecasetime = time.time()
                         runonecasetime = round(endonecasetime - startonecasetime, 2)
-                        savedata = "insert into automation_function_web  (`browsername`,`browserconfigure`,`browserstatus`,`operatetype`,`element`,`parameter`,`waittime`,`rundescribe`,`caseexecute`,`runcasetime`,`caseid`,`eventid`,`casereport`,`createdtime`,`updatetime`)VALUES('%s','%s','%s','%s',\'''%s\''','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')" % (
+                        savedata = "insert into automationquery_automation_function_web  (`browsername`,`browserconfigure`,`browserstatus`,`operatetype`,`element`,`parameter`,`waittime`,`rundescribe`,`caseexecute`,`runcasetime`,`caseid`,`eventid`,`casereport`,`createdtime`,`updatetime`)VALUES('%s','%s','%s','%s',\'''%s\''','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')" % (
                             browsername, browserconfigure, browserstatus, operatetype, element, parameter, waittime,
                             rundescribe,
                             caseexecute,
@@ -723,7 +723,7 @@ class WebAutomation(object):
                 driver.quit()
             else:
                 print("浏览%s,状态为不执行，故该浏览器上不运行用例。" % (devicesinfocase[0]))
-                savedata = "insert into automation_function_web  (`browsername`,`browserconfigure`,`browserstatus`,`operatetype`,`element`,`parameter`,`waittime`,`rundescribe`,`caseexecute`,`runcasetime`,`caseid`,`eventid`,`casereport`,`createdtime`,`updatetime`)VALUES('%s','%s','%s','%s',\'''%s\''','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')" % (
+                savedata = "insert into automationquery_automation_function_web  (`browsername`,`browserconfigure`,`browserstatus`,`operatetype`,`element`,`parameter`,`waittime`,`rundescribe`,`caseexecute`,`runcasetime`,`caseid`,`eventid`,`casereport`,`createdtime`,`updatetime`)VALUES('%s','%s','%s','%s',\'''%s\''','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')" % (
                     browsername, browserconfigure, browserstatus, "", "", "", "",
                     "",
                     "",

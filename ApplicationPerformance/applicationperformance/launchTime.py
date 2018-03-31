@@ -74,7 +74,7 @@ class LaunchApplication(object):
                                     print("第%s次启动时间为：" % (launchcount), launchtime)
                                     time.sleep(5)
                                     LaunchApplication().stopApp(packname, devicesid)  # 关闭APP
-                                    savedata = "insert into automation_Launch_app  (`starttime`,`launchtime`,`endtime`,`launchtype`,`createdtime`,`updatetime`,`caseid`,`eventid`)VALUES('%s','%s','%s','%s','%s','%s','%s','%s')" % (
+                                    savedata = "insert into automationquery_automation_launch_app  (`starttime`,`launchtime`,`endtime`,`launchtype`,`createdtime`,`updatetime`,`caseid`,`eventid`)VALUES('%s','%s','%s','%s','%s','%s','%s','%s')" % (
                                         starttime, launchtime, endtime, launchtype,
                                         time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
                                         time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), caseid,eventid)
@@ -98,7 +98,7 @@ class LaunchApplication(object):
                                     print("第%s次启动时间为：" % (launchcount), launchtime)
                                     time.sleep(5)
                                     LaunchApplication().stopApp(packname, devicesid)  # 关闭APP
-                                    savedata = "insert into automation_Launch_app  (`starttime`,`launchtime`,`endtime`,`launchtype`,`createdtime`,`updatetime`,`caseid`,`eventid`)VALUES('%s','%s','%s','%s','%s','%s','%s','%s')" % (
+                                    savedata = "insert into automationquery_automation_launch_app  (`starttime`,`launchtime`,`endtime`,`launchtype`,`createdtime`,`updatetime`,`caseid`,`eventid`)VALUES('%s','%s','%s','%s','%s','%s','%s','%s')" % (
                                         starttime, launchtime, endtime, launchtype,
                                         time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
                                         time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), caseid, eventid)

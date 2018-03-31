@@ -96,7 +96,7 @@ class MemoryApplicationData(object):
                             runnumber += 1
                         if memorydatas.endswith(','):  # 处理cpuproportions字符串，把结尾的逗号去掉
                             memorydatas = memorydatas.rstrip(',')
-                        savedata = "insert into automation_mem_app  (`memorysize`,`starttime`,`endtime`,`monkeyscript`,`functionscript`,`createdtime`,`updatetime`,`caseid`,`runtime`,`eventid`)VALUES('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')" % (
+                        savedata = "insert into automationquery_automation_mem_app  (`memorysize`,`starttime`,`endtime`,`monkeyscript`,`functionscript`,`createdtime`,`updatetime`,`caseid`,`runtime`,`eventid`)VALUES('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')" % (
                             memorydatas, startruntime, endruntime, monkeyscript, functionscript,
                             time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
                             time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), caseid, runtimes, eventid)
@@ -112,7 +112,7 @@ class MemoryApplicationData(object):
                             endruntime = time.time()
                             runtime = int(str(endruntime - startruntime).split(".")[1][0:4])
                             runtimes = endruntime - startruntime
-                            savedata = "insert into automation_mem_app  (`memorysize`,`starttime`,`endtime`,`monkeyscript`,`functionscript`,`createdtime`,`updatetime`,`caseid`,`runtime`,`eventid`)VALUES('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')" % (
+                            savedata = "insert into automationquery_automation_mem_app  (`memorysize`,`starttime`,`endtime`,`monkeyscript`,`functionscript`,`createdtime`,`updatetime`,`caseid`,`runtime`,`eventid`)VALUES('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')" % (
                                 memorydata, startruntime, endruntime, monkeyscript, functionscript,
                                 time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
                                 time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), caseid, runtimes, eventid)
@@ -131,7 +131,7 @@ class MemoryApplicationData(object):
                             endruntime = time.time()
                             runtime = int(str(endruntime - startruntime).split(".")[1][0:4])
                             runtimes = endruntime - startruntime
-                            savedata = "insert into automation_mem_app  (`memorysize`,`starttime`,`endtime`,`monkeyscript`,`functionscript`,`createdtime`,`updatetime`,`caseid`,`runtime`,`eventid`)VALUES('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')" % (
+                            savedata = "insert into automationquery_automation_mem_app  (`memorysize`,`starttime`,`endtime`,`monkeyscript`,`functionscript`,`createdtime`,`updatetime`,`caseid`,`runtime`,`eventid`)VALUES('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')" % (
                                 memorydata, startruntime, endruntime, monkeyscript, functionscript,
                                 time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
                                 time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), caseid, runtimes, eventid)

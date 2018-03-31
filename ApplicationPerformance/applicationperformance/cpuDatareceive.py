@@ -137,7 +137,7 @@ class CpuApplicationData(object):
                             runnumber += 1
                         if cpuproportions.endswith(','):  # 处理cpuproportions字符串，把结尾的逗号去掉
                             cpuproportions = cpuproportions.rstrip(',')
-                        savedata = "insert into automation_cpu_app  (`cpuproportion`,`starttime`,`endtime`,`monkeyscript`,`functionscript`,`createdtime`,`updatetime`,`caseid`,`runtime`,`eventid`)VALUES('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')" % (
+                        savedata = "insert into automationquery_automation_cpu_app  (`cpuproportion`,`starttime`,`endtime`,`monkeyscript`,`functionscript`,`createdtime`,`updatetime`,`caseid`,`runtime`,`eventid`)VALUES('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')" % (
                             cpuproportions, startruntime, endruntime, monkeyscript, functionscript,
                             time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
                             time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), caseid, runtimes, eventid)
@@ -152,7 +152,7 @@ class CpuApplicationData(object):
                             endruntime = time.time()
                             runtime = int(str(endruntime - startruntime).split(".")[1][0:4])
                             runtimes = endruntime - startruntime
-                            savedata = "insert into automation_cpu_app  (`cpuproportion`,`starttime`,`endtime`,`monkeyscript`,`functionscript`,`createdtime`,`updatetime`,`caseid`,`runtime`,`eventid`)VALUES('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')" % (
+                            savedata = "insert into automationquery_automation_cpu_app  (`cpuproportion`,`starttime`,`endtime`,`monkeyscript`,`functionscript`,`createdtime`,`updatetime`,`caseid`,`runtime`,`eventid`)VALUES('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')" % (
                                 cpuproportion, startruntime, endruntime, monkeyscript, functionscript,
                                 time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
                                 time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), caseid, runtimes, eventid)
@@ -170,7 +170,7 @@ class CpuApplicationData(object):
                             endruntime = time.time()
                             runtime = int(str(endruntime - startruntime).split(".")[1][0:4])
                             runtimes = endruntime - startruntime
-                            savedata = "insert into automation_cpu_app  (`cpuproportion`,`starttime`,`endtime`,`monkeyscript`,`functionscript`,`createdtime`,`updatetime`,`caseid`,`runtime`,`eventid`)VALUES('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')" % (
+                            savedata = "insert into automationquery_automation_cpu_app  (`cpuproportion`,`starttime`,`endtime`,`monkeyscript`,`functionscript`,`createdtime`,`updatetime`,`caseid`,`runtime`,`eventid`)VALUES('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')" % (
                                 cpuproportion, startruntime, endruntime, monkeyscript, functionscript,
                                 time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
                                 time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), caseid, runtimes, eventid)

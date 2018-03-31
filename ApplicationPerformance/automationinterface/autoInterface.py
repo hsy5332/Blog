@@ -71,7 +71,7 @@ def readExcel():
                         returnparm = ("E%s" % (int(excledata_sheel.row_values(i)[0]) + 1))
                         sheetform[returnparm] = str(returndatalist[0])
                         returndatalist = []
-                        savedate = "insert into automation_interface  (`interfaceurl`,`requestparameter`,`returnparameter`,`requesttype`,`casestatus`,`caseid`,`remark`,`createdtime`,`updatetime`,`eventid`)VALUES(\"%s\",\"%s\",\"%s\",'%s','%s','%s',\"%s\",'%s','%s','%s')" % (
+                        savedate = "insert into automationquery_automation_interface  (`interfaceurl`,`requestparameter`,`returnparameter`,`requesttype`,`casestatus`,`caseid`,`remark`,`createdtime`,`updatetime`,`eventid`)VALUES(\"%s\",\"%s\",\"%s\",'%s','%s','%s',\"%s\",'%s','%s','%s')" % (
                             url, datadict, returnparameter, str(row_data[3]), int(row_data[4]), int(row_data[0]),
                             str(row_data[5]),
                             time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
@@ -86,7 +86,7 @@ def readExcel():
                         sheetform[returnparm].font = sheetformOnestyle
                         returnparameter = "返回的参数有问题"
                         returndatalist = []
-                        savedate = "insert into automation_interface  (`interfaceurl`,`requestparameter`,`returnparameter`,`requesttype`,`casestatus`,`caseid`,`remark`,`createdtime`,`updatetime`,`eventid`)VALUES(\"%s\",\"%s\",\"%s\",'%s','%s','%s',\"%s\",'%s','%s','%s')" % (
+                        savedate = "insert into automationquery_automation_interface  (`interfaceurl`,`requestparameter`,`returnparameter`,`requesttype`,`casestatus`,`caseid`,`remark`,`createdtime`,`updatetime`,`eventid`)VALUES(\"%s\",\"%s\",\"%s\",'%s','%s','%s',\"%s\",'%s','%s','%s')" % (
                             url, datadict, returnparameter, str(row_data[3]), int(row_data[4]), int(row_data[0]),
                             str(row_data[5]),
                             time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
@@ -101,7 +101,7 @@ def readExcel():
                         returnparm = ("E%s" % (int(excledata_sheel.row_values(i)[0]) + 1))
                         sheetform[returnparm] = str(returndatalist[0])
                         returndatalist = []
-                        savedate = "insert into automation_interface  (`interfaceurl`,`requestparameter`,`returnparameter`,`requesttype`,`casestatus`,`caseid`,`remark`,`createdtime`,`updatetime`,`eventid`)VALUES(\"%s\",\"%s\",\"%s\",'%s','%s','%s',\"%s\",'%s','%s','%s')" % (
+                        savedate = "insert into automationquery_automation_interface  (`interfaceurl`,`requestparameter`,`returnparameter`,`requesttype`,`casestatus`,`caseid`,`remark`,`createdtime`,`updatetime`,`eventid`)VALUES(\"%s\",\"%s\",\"%s\",'%s','%s','%s',\"%s\",'%s','%s','%s')" % (
                             url, datadict, returnparameter, str(row_data[3]), row_data[4], int(row_data[0]),
                             str(row_data[5]),
                             time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
@@ -117,7 +117,7 @@ def readExcel():
                         sheetform[returnparm].font = sheetformOnestyle
                         returnparameter = "返回的参数有问题"
                         returndatalist = []
-                        savedate = "insert into automation_interface  (`interfaceurl`,`requestparameter`,`returnparameter`,`requesttype`,`casestatus`,`caseid`,`remark`,`createdtime`,`updatetime`,`eventid`)VALUES(\"%s\",\"%s\",\"%s\",'%s','%s','%s',\"%s\",'%s','%s','%s')" % (
+                        savedate = "insert into automationquery_automation_interface  (`interfaceurl`,`requestparameter`,`returnparameter`,`requesttype`,`casestatus`,`caseid`,`remark`,`createdtime`,`updatetime`,`eventid`)VALUES(\"%s\",\"%s\",\"%s\",'%s','%s','%s',\"%s\",'%s','%s','%s')" % (
                             url, datadict, returnparameter, str(row_data[3]), row_data[4], int(row_data[0]),
                             str(row_data[5]),
                             time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
@@ -132,7 +132,7 @@ def readExcel():
                     sheetform[returnparm].font = sheetformOnestyle
                     returndatalist = []
                     returnparameter = "请求方式有问题"
-                    savedate = "insert into automation_interface  (`interfaceurl`,`requestparameter`,`returnparameter`,`requesttype`,`casestatus`,`caseid`,`remark`,`createdtime`,`updatetime`,`eventid`)VALUES(\"%s\",\"%s\",\"%s\",'%s','%s','%s',\"%s\",'%s','%s','%s')" % (
+                    savedate = "insert into automationquery_automation_interface  (`interfaceurl`,`requestparameter`,`returnparameter`,`requesttype`,`casestatus`,`caseid`,`remark`,`createdtime`,`updatetime`,`eventid`)VALUES(\"%s\",\"%s\",\"%s\",'%s','%s','%s',\"%s\",'%s','%s','%s')" % (
                         url, datadict, returnparameter, str(row_data[3]), int(row_data[4]), int(row_data[0]),
                         str(row_data[5]),
                         time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
@@ -147,7 +147,7 @@ def readExcel():
                 sheetform[returnparm].font = sheetformOnestyle
                 returndatalist = []
                 returnparameter = " "
-                savedate = "insert into automation_interface  (`interfaceurl`,`requestparameter`,`returnparameter`,`requesttype`,`casestatus`,`caseid`,`remark`,`createdtime`,`updatetime`,`eventid`)VALUES(\"%s\",\"%s\",\"%s\",'%s','%s','%s',\"%s\",'%s','%s','%s')" % (
+                savedate = "insert into automationquery_automation_interface  (`interfaceurl`,`requestparameter`,`returnparameter`,`requesttype`,`casestatus`,`caseid`,`remark`,`createdtime`,`updatetime`,`eventid`)VALUES(\"%s\",\"%s\",\"%s\",'%s','%s','%s',\"%s\",'%s','%s','%s')" % (
                     url, datadict, returnparameter, str(row_data[3]), int(row_data[4]), int(row_data[0]),
                     str(row_data[5]),
                     time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
@@ -162,7 +162,7 @@ def readExcel():
             sheetform[returnparm].font = sheetformOnestyle
             returndatalist = []
             returnparameter = " "
-            savedate = "insert into automation_interface  (`interfaceurl`,`requestparameter`,`returnparameter`,`requesttype`,`casestatus`,`caseid`,`remark`,`createdtime`,`updatetime`,`eventid`)VALUES(\"%s\",\"%s\",\"%s\",'%s','%s','%s',\"%s\",'%s','%s','%s')" % (
+            savedate = "insert into automationquery_automation_interface  (`interfaceurl`,`requestparameter`,`returnparameter`,`requesttype`,`casestatus`,`caseid`,`remark`,`createdtime`,`updatetime`,`eventid`)VALUES(\"%s\",\"%s\",\"%s\",'%s','%s','%s',\"%s\",'%s','%s','%s')" % (
                 url, datadict, returnparameter, str(row_data[3]), int(row_data[4]), int(row_data[0]),
                 str(row_data[5]),
                 time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
